@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: fillytrckr-frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - fillytrckr_network
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/fillytrckr
+    networks:
+      - fillytrckr_network
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=fillytrckr
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fillytrckr_network
+
+volumes:
+  postgres_data:
+
+networks:
+  fillytrckr_network:
+    driver: bridge
