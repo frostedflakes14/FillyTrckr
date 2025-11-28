@@ -218,65 +218,117 @@ class db_connect:
             rolls = session.query(db_filly_roll).filter(db_filly_roll.weight_grams > 0).all()
             return [roll.to_dict() for roll in rolls]
 
+    def get_filly_rolls_active_filter(self,
+                                      # TODO the inputs should be cleaned by the api layer (ie strs should be all lowercase and stripped)
+                                      type=None,
+                                      type_id=None,
+                                      brand=None,
+                                      brand_id=None,
+                                      surface=None,
+                                      surface_id=None,
+                                      color=None,
+                                      color_id=None,
+                                      subtype=None,
+                                      subtype_id=None,
+                                      opened=None,
+                                      in_use=None,
+                                      ):
+        """Get all in use filament rolls (on the printer) with optional filters.
+
+        Args:
+            type (str, optional): Filament type name to filter by.
+            type_id (int, optional): Filament type ID to filter by.
+            brand (str, optional): Filament brand name to filter by.
+            brand_id (int, optional): Filament brand ID to filter by.
+            surface (str, optional): Filament surface name to filter by.
+            surface_id (int, optional): Filament surface ID to filter by.
+            color (str, optional): Filament color name to filter by.
+            color_id (int, optional): Filament color ID to filter by.
+            subtype (str, optional): Filament subtype name to filter by.
+            subtype_id (int, optional): Filament subtype ID to filter by.
+            opened (bool, optional): Filter by opened status.
+            in_use (bool, optional): Filter by in use status.
+        """
+        with self.get_session() as session:
+            query = session.query(db_filly_roll).filter(db_filly_roll.weight_grams > 0)
+
+            if type:
+                query = query.join(db_filly_types).filter(db_filly_types.name == type)
+            if type_id:
+                query = query.filter(db_filly_roll.type_id == type_id)
+            if brand:
+                query = query.join(db_filly_brands).filter(db_filly_brands.name == brand)
+            if brand_id:
+                query = query.filter(db_filly_roll.brand_id == brand_id)
+            if surface:
+                query = query.join(db_filly_surfaces).filter(db_filly_surfaces.name == surface)
+            if surface_id:
+                query = query.filter(db_filly_roll.surface_id == surface_id)
+            if color:
+                query = query.join(db_filly_colors).filter(db_filly_colors.name == color)
+            if color_id:
+                query = query.filter(db_filly_roll.color_id == color_id)
+            if subtype:
+                query = query.join(db_filly_subtypes).filter(db_filly_subtypes.name == subtype)
+            if subtype_id:
+                query = query.filter(db_filly_roll.subtype_id == subtype_id)
+            if opened is not None:
+                query = query.filter(db_filly_roll.opened == opened)
+            if in_use is not None:
+                query = query.filter(db_filly_roll.in_use == in_use)
+
+            rolls = query.all()
+            return [roll.to_dict() for roll in rolls]
+
     def get_filly_types(self):
         """Get all filament types.
 
         Returns:
-            Dict of filament type names:ids.
+            Dict of filament types
         """
         with self.get_session() as session:
             types = session.query(db_filly_types).all()
-            # convert types to dict
-            response = {t.name: t.id for t in types}
-            return response
+            return [t.to_dict() for t in types]
 
     def get_filly_brands(self):
         """Get all filament brands.
 
         Returns:
-            Dict of filament brand names:ids.
+            Dict of filament brands
         """
         with self.get_session() as session:
             brands = session.query(db_filly_brands).all()
-            # convert brands to dict
-            response = {b.name: b.id for b in brands}
-            return response
+            return [b.to_dict() for b in brands]
 
     def get_filly_surfaces(self):
         """Get all filament surfaces.
 
         Returns:
-            Dict of filament surface names:ids.
+            Dict of filament surfaces
         """
         with self.get_session() as session:
             surfaces = session.query(db_filly_surfaces).all()
-            # convert surfaces to dict
-            response = {s.name: s.id for s in surfaces}
-            return response
+            return [s.to_dict() for s in surfaces]
 
     def get_filly_colors(self):
         """Get all filament colors.
 
         Returns:
-            Dict of filament color names:ids.
+            Dict of filament colors
         """
         with self.get_session() as session:
             colors = session.query(db_filly_colors).all()
-            # convert colors to dict
-            response = {c.name: c.id for c in colors}
-            return response
+            return [c.to_dict() for c in colors]
 
     def get_filly_subtypes(self):
         """Get all filament subtypes.
 
         Returns:
-            Dict of filament subtype names:ids.
+            Dict of filament subtypes
         """
         with self.get_session() as session:
             subtypes = session.query(db_filly_subtypes).all()
-            # convert subtypes to dict
-            response = {s.name: s.id for s in subtypes}
-            return response
+            return [s.to_dict() for s in subtypes]
 
     def insert_dummy_filly_roll(self):
         """Insert a dummy filly roll for testing purposes."""

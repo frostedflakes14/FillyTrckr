@@ -1,18 +1,18 @@
 """Script for populating the filly defaults"""
 
 filly_types_defaults = [
-    'PLA',
-    'ABS',
-    'PETG',
-    'TPU',
+    'pla',
+    'abs',
+    'petg',
+    'tpu',
 ]
 
 filly_brands_defaults = [
-    'Bambu',
-    'Sunlu',
-    'Inland',
-    'Prusament',
-    'eSun',
+    'bambu',
+    'sunlu',
+    'inland',
+    'prusament',
+    'esun',
 ]
 
 filly_surfaces_defaults = [

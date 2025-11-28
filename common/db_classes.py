@@ -25,6 +25,18 @@ class db_filly_types(Base):
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
+    def to_dict(self):
+        """Convert the filly type to a dictionary representation.
+
+        Returns:
+            Dictionary containing type information
+        """
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
+
 class db_filly_brands(Base):
     """Filament brands: Bambu, Sunlu, Inland, Prusament, eSun, etc."""
     __tablename__ = 'filly_brands'
@@ -32,6 +44,18 @@ class db_filly_brands(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    def to_dict(self):
+        """Convert the filly type to a dictionary representation.
+
+        Returns:
+            Dictionary containing type information
+        """
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
 
 class db_filly_surfaces(Base):
     """Filament surface types: Basic/Normal, Matte, Silk, Metal, Wood.
@@ -42,6 +66,18 @@ class db_filly_surfaces(Base):
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
+    def to_dict(self):
+        """Convert the filly type to a dictionary representation.
+
+        Returns:
+            Dictionary containing type information
+        """
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
+
 class db_filly_colors(Base):
     """Filament color options. Most should be Red, Blue, Green, etc. But some could be multi-color or special colors, like wood type"""
     __tablename__ = 'filly_colors'
@@ -51,6 +87,17 @@ class db_filly_colors(Base):
     # TODO maybe add hex code column later
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
+    def to_dict(self):
+        """Convert the filly type to a dictionary representation.
+
+        Returns:
+            Dictionary containing type information
+        """
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
 
 class db_filly_subtypes(Base):
     """Filament subtypes: HF, Silk, Plus, Metal, wood, etc."""
@@ -60,6 +107,17 @@ class db_filly_subtypes(Base):
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
+    def to_dict(self):
+        """Convert the filly type to a dictionary representation.
+
+        Returns:
+            Dictionary containing type information
+        """
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
 
 class db_filly_roll(Base):
     """Filly roll table"""
