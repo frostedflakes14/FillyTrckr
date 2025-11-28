@@ -12,7 +12,7 @@
                      ▼                            ▼
     ┌────────────────────────────┐  ┌────────────────────────────────────┐
     │                            │  │                                    │
-    │   React/Angular Frontend   │  │    Optional: Reverse Proxy         │
+    │   React/Angular Frontend   │  │    Reverse Proxy                   │
     │        Container           │  │    (nginx/traefik)                 │
     │                            │  │    For external API access         │
     │  - Dashboard/Table View    │  │                                    │
