@@ -23,7 +23,7 @@ class db_filly_types(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), timezone=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 class db_filly_brands(Base):
     """Filament brands: Bambu, Sunlu, Inland, Prusament, eSun, etc."""
@@ -31,7 +31,7 @@ class db_filly_brands(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), timezone=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 class db_filly_surfaces(Base):
     """Filament surface types: Basic/Normal, Matte, Silk, Metal, Wood.
@@ -40,7 +40,7 @@ class db_filly_surfaces(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), timezone=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 class db_filly_colors(Base):
     """Filament color options. Most should be Red, Blue, Green, etc. But some could be multi-color or special colors, like wood type"""
@@ -49,7 +49,7 @@ class db_filly_colors(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     # TODO maybe add hex code column later
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), timezone=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
 class db_filly_subtypes(Base):
@@ -58,7 +58,7 @@ class db_filly_subtypes(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), timezone=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
 
 class db_filly_roll(Base):
@@ -75,11 +75,11 @@ class db_filly_roll(Base):
     original_weight_grams = Column(Double) # shouldn't be changed after creation
     opened = Column(Boolean, nullable=False, default=False)
     is_active = Column(Boolean, nullable=False, default=False) # on the printer
-    created_at = Column(DateTime, nullable=False, server_default=func.now(), timezone=True)
-    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now(), timezone=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
-    type = relationship("filly_types")
-    brand = relationship("filly_brands")
-    surface = relationship("filly_surfaces")
-    color = relationship("filly_colors")
-    subtype = relationship("filly_subtypes")
+    type = relationship("db_filly_types")
+    brand = relationship("db_filly_brands")
+    surface = relationship("db_filly_surfaces")
+    color = relationship("db_filly_colors")
+    subtype = relationship("db_filly_subtypes")
