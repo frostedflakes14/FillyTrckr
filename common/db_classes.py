@@ -74,7 +74,7 @@ class db_filly_roll(Base):
     weight_grams = Column(Double) # current weight, will be updated. After its 0 or below, the roll is considered empty
     original_weight_grams = Column(Double) # shouldn't be changed after creation
     opened = Column(Boolean, nullable=False, default=False)
-    is_active = Column(Boolean, nullable=False, default=False) # on the printer
+    in_use = Column(Boolean, nullable=False, default=False) # on the printer
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
@@ -83,3 +83,29 @@ class db_filly_roll(Base):
     surface = relationship("db_filly_surfaces")
     color = relationship("db_filly_colors")
     subtype = relationship("db_filly_subtypes")
+
+    def to_dict(self):
+        """Convert the filly roll to a dictionary representation.
+
+        Returns:
+            Dictionary containing roll information with related data
+        """
+        return {
+            'id': self.id,
+            'type': self.type.name if self.type else None,
+            'type_id': self.type_id,
+            'brand': self.brand.name if self.brand else None,
+            'brand_id': self.brand_id,
+            'surface': self.surface.name if self.surface else None,
+            'surface_id': self.surface_id,
+            'color': self.color.name if self.color else None,
+            'color_id': self.color_id,
+            'subtype': self.subtype.name if self.subtype else None,
+            'subtype_id': self.subtype_id,
+            'weight_grams': self.weight_grams,
+            'original_weight_grams': self.original_weight_grams,
+            'opened': self.opened,
+            'in_use': self.in_use,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }

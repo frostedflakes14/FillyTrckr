@@ -189,33 +189,111 @@ class db_connect:
 
     # TODO create insert and query methods
 
-    def get_all_active_fillys(self):
-        """Get all active filament rolls.
+    def get_filly_rolls_in_use(self):
+        """Get all in use filament rolls (on the printer)
 
         Returns:
-            List of dictionaries containing roll information with related data
+            list of dicts of each filly roll, dict defined by to_dict in db_filly_roll class
         """
         with self.get_session() as session:
-            # TODO this filter isn't correct
-            rolls = session.query(db_filly_roll).filter_by(is_active=True).all()
+            rolls = session.query(db_filly_roll).filter_by(in_use=True).all()
+            return [roll.to_dict() for roll in rolls]
 
-            result = []
-            for roll in rolls:
-                result.append({
-                    'id': roll.id,
-                    'type': roll.type.name,
-                    'brand': roll.brand.name,
-                    'surface': roll.surface.name,
-                    'color': roll.color.name,
-                    'subtype': roll.subtype.name if roll.subtype else None,
-                    'weight_grams': roll.weight_grams,
-                    'original_weight_grams': roll.original_weight_grams,
-                    'opened': roll.opened,
-                    'created_at': roll.created_at.isoformat() if roll.created_at else None,
-                    'updated_at': roll.updated_at.isoformat() if roll.updated_at else None,
-                })
+    def get_filly_rolls_all(self):
+        """Get all filament rolls in the database.
 
-            return result
+        Returns:
+            list of dicts of each filly roll, dict defined by to_dict in db_filly_roll class
+        """
+        with self.get_session() as session:
+            rolls = session.query(db_filly_roll).all()
+            return [roll.to_dict() for roll in rolls]
+
+    def get_filly_rolls_active(self):
+        """Get all active filament rolls (not empty)
+        Returns:
+            list of dicts of each filly roll, dict defined by to_dict in db_filly_roll class
+        """
+        with self.get_session() as session:
+            rolls = session.query(db_filly_roll).filter(db_filly_roll.weight_grams > 0).all()
+            return [roll.to_dict() for roll in rolls]
+
+    def get_filly_types(self):
+        """Get all filament types.
+
+        Returns:
+            Dict of filament type names:ids.
+        """
+        with self.get_session() as session:
+            types = session.query(db_filly_types).all()
+            # convert types to dict
+            response = {t.name: t.id for t in types}
+            return response
+
+    def get_filly_brands(self):
+        """Get all filament brands.
+
+        Returns:
+            Dict of filament brand names:ids.
+        """
+        with self.get_session() as session:
+            brands = session.query(db_filly_brands).all()
+            # convert brands to dict
+            response = {b.name: b.id for b in brands}
+            return response
+
+    def get_filly_surfaces(self):
+        """Get all filament surfaces.
+
+        Returns:
+            Dict of filament surface names:ids.
+        """
+        with self.get_session() as session:
+            surfaces = session.query(db_filly_surfaces).all()
+            # convert surfaces to dict
+            response = {s.name: s.id for s in surfaces}
+            return response
+
+    def get_filly_colors(self):
+        """Get all filament colors.
+
+        Returns:
+            Dict of filament color names:ids.
+        """
+        with self.get_session() as session:
+            colors = session.query(db_filly_colors).all()
+            # convert colors to dict
+            response = {c.name: c.id for c in colors}
+            return response
+
+    def get_filly_subtypes(self):
+        """Get all filament subtypes.
+
+        Returns:
+            Dict of filament subtype names:ids.
+        """
+        with self.get_session() as session:
+            subtypes = session.query(db_filly_subtypes).all()
+            # convert subtypes to dict
+            response = {s.name: s.id for s in subtypes}
+            return response
+
+    def insert_dummy_filly_roll(self):
+        """Insert a dummy filly roll for testing purposes."""
+        with self.get_session() as session:
+            dummy_roll = db_filly_roll(
+                type_id=1,
+                brand_id=1,
+                surface_id=1,
+                color_id=1,
+                subtype_id=1,
+                weight_grams=500,
+                original_weight_grams=1000,
+                opened=True,
+                in_use=False
+            )
+            session.add(dummy_roll)
+            print("Inserted dummy filly roll for testing.")
 
 def main():
     """Main function to test database connection and configuration."""
