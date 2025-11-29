@@ -405,7 +405,7 @@ class db_connect:
                 return # TODO return some error to the API caller?
 
             roll.opened = True
-            print(f"Marked filly roll ID {roll_id} as opened.")
+            print(f"Marked filly roll {roll.descriptive_name} as opened.")
         # TODO return some confirmation or updated roll info
 
     def change_in_use_status(self, roll_id, in_use):
@@ -423,7 +423,7 @@ class db_connect:
 
             roll.in_use = in_use
             status_str = "in use" if in_use else "not in use"
-            print(f"Set filly roll ID {roll_id} as {status_str}.") # TODO change roll_id to use roll name? Need to add roll name
+            print(f"Set filly roll {roll.descriptive_name} as {status_str}.")
         # TODO return some confirmation or updated roll info
 
     def update_roll_weight(self, roll_id, new_weight_grams=None, decr_weight_grams=None):
