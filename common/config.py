@@ -1,5 +1,8 @@
 import json
 import os
+from common_logging import get_logger
+
+logger = get_logger()
 
 class filly_trkr_config:
     """Configuration class for FillyTrckr application.
@@ -64,18 +67,18 @@ class filly_trkr_config:
 
         if os.path.exists(config_filepath):
             try:
-                print(f'Found config file at {config_filepath}, loading settings.')
+                logger.info(f'Found config file at {config_filepath}, loading settings.')
                 with open(config_filepath, 'r') as f:
                     config = json.load(f)
                 return config
             except json.JSONDecodeError:
-                print("config.json is not a valid JSON file.")
+                logger.error("config.json is not a valid JSON file.")
                 raise
             except Exception as e:
-                print(f"An unexpected error occurred while loading config.json: {e}")
+                logger.error(f"An unexpected error occurred while loading config.json: {e}")
                 raise
         else:
-            print(f'Config file not found at {config_filepath}, loading environment variables.')
+            logger.info(f'Config file not found at {config_filepath}, loading environment variables.')
             return self._load_env_vars()
 
     def _load_env_vars(self):

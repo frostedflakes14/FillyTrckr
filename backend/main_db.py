@@ -18,6 +18,7 @@ from sqlalchemy.exc import OperationalError
 common_path = Path(__file__).parent.parent / "common"
 sys.path.insert(0, str(common_path))
 from config import filly_trkr_config
+from common_logging import get_logger
 from db_base import Base
 from db_classes import (
     db_filly_types,
@@ -35,6 +36,11 @@ from populate_default_tables import (
     filly_subtypes_defaults
 )
 
+logger = get_logger()
+
+def default_result():
+    # TODO define an error statement item?
+    return {'result': False, 'data': {}}
 
 class db_connect:
     """Database connection manager class.
@@ -57,9 +63,8 @@ class db_connect:
 
     def _initialize_database(self):
         """Internal method to set up the database engine and schema."""
-        print(self._config.database_info.db_dir)
+        logger.info("Initializing database...")
         db_url = self._config.database_info._db_connection_string
-        print(db_url)
         if self._config.database_info.type == 'sqlite':
             # Ensure the database directory exists
             db_dir = self._config.database_info.db_dir
@@ -69,9 +74,10 @@ class db_connect:
             self.engine = create_engine(db_url, echo=False)
             # Test the connection
             with self.engine.connect() as conn:
-                print("Successfully connected to database.")
+                logger.info("Successfully connected to database.")
                 self.db_connected = True
         except OperationalError as e:
+            logger.error(f"Failed to connect to database. Error: {str(e)}")
             raise ConnectionError(
                 f"Failed to connect to database. Error: {str(e)}"
             ) from e
@@ -110,7 +116,7 @@ class db_connect:
         Safe to run multiple times without creating duplicates.
         Uses efficient bulk queries to check existing entries.
         """
-        print("Populating default data...")
+        logger.info("Populating default data...")
 
         with self.get_session() as session:
             added_count = 0
@@ -156,9 +162,9 @@ class db_connect:
                     added_count += 1
 
             if added_count > 0:
-                print(f"Added {added_count} new default entries.")
+                logger.info(f"Added {added_count} new default entries.")
             else:
-                print("All default data already exists. No new entries added.")
+                logger.info("All default data already exists. No new entries added.")
 
     # Database query methods
 
@@ -222,6 +228,7 @@ class db_connect:
             opened (bool, optional): Filter by opened status.
             in_use (bool, optional): Filter by in use status.
         """
+        logger.info(f'Getting active filly rolls with filters: type={type}, type_id={type_id}, brand={brand}, brand_id={brand_id}, surface={surface}, surface_id={surface_id}, color={color}, color_id={color_id}, subtype={subtype}, subtype_id={subtype_id}, opened={opened}, in_use={in_use}')
         with self.get_session() as session:
             query = session.query(db_filly_roll).filter(db_filly_roll.weight_grams > 0)
 
@@ -321,7 +328,7 @@ class db_connect:
                 in_use=False
             )
             session.add(dummy_roll)
-            print("Inserted dummy filly roll for testing.")
+            logger.info("Inserted dummy filly roll for testing.")
 
     def insert_roll(self,
                     type_id,
@@ -346,6 +353,8 @@ class db_connect:
             opened (bool, optional): Whether the roll is opened. Defaults to False.
             in_use (bool, optional): Whether the roll is in use. Defaults to False.
         """
+        logger.info(f'Inserting new filly roll: type_id={type_id}, brand_id={brand_id}, surface_id={surface_id}, color_id={color_id}, subtype_id={subtype_id}, original_weight_grams={original_weight_grams}, weight_grams={weight_grams}, opened={opened}, in_use={in_use}')
+        roll_data = default_result()
         with self.get_session() as session:
             if weight_grams is None:
                 weight_grams = original_weight_grams
@@ -361,8 +370,14 @@ class db_connect:
                 in_use=in_use
             )
             session.add(new_roll)
-            print("Inserted new filly roll into the database.")
-        # TODO return new roll ID
+            session.flush()  # This assigns the ID and makes relationships accessible
+            logger.info(f"Successfully inserted new filly roll: {new_roll.descriptive_name}")
+
+            # Get the roll data before session closes
+            roll_data['data'] = new_roll.to_dict()
+            roll_data['result'] = True
+
+        return roll_data
 
     def insert_dup_roll(self, roll_id, original_weight_grams=1000):
         """Insert a duplicate of an existing filly roll.
@@ -371,10 +386,11 @@ class db_connect:
             roll_id (int): ID of the filly roll to duplicate.
             original_weight_grams (float, optional): Original weight for the new roll. Defaults to 1000.
         """
+        roll_data = default_result()
         with self.get_session() as session:
             original_roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
             if not original_roll:
-                print(f"No filly roll found with ID {roll_id}. Cannot duplicate.")
+                logger.error(f"No filly roll found with ID {roll_id}. Cannot duplicate.")
                 return # TODO return some error to the API caller?
 
             dup_roll = db_filly_roll(
@@ -389,7 +405,11 @@ class db_connect:
                 in_use=False
             )
             session.add(dup_roll)
-            print(f"Duplicated filly roll ID {roll_id} as new roll.")
+            session.flush()  # This assigns the ID and makes relationships accessible
+            logger.info(f"Successfully duplicated filly roll: {dup_roll.descriptive_name}")
+            roll_data['data'] = dup_roll.to_dict()
+            roll_data['result'] = True
+        return roll_data
         # TODO return new roll ID
 
     def open_roll(self, roll_id):
@@ -398,15 +418,19 @@ class db_connect:
         Args:
             roll_id (int): ID of the filly roll to mark as opened.
         """
+        roll_data = default_result()
         with self.get_session() as session:
             roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
             if not roll:
-                print(f"No filly roll found with ID {roll_id}. Cannot open.")
-                return # TODO return some error to the API caller?
+                logger.error(f"No filly roll found with ID {roll_id}. Cannot open.")
+                return roll_data
 
             roll.opened = True
-            print(f"Marked filly roll {roll.descriptive_name} as opened.")
-        # TODO return some confirmation or updated roll info
+            logger.info(f"Marked filly roll as opened: {roll.descriptive_name}")
+            roll_data['data'] = roll.to_dict()
+            roll_data['result'] = True
+
+        return roll_data
 
     def change_in_use_status(self, roll_id, in_use):
         """Change the in_use status of a filly roll.
@@ -415,16 +439,19 @@ class db_connect:
             roll_id (int): ID of the filly roll to update.
             in_use (bool): New in_use status.
         """
+        roll_data = default_result()
         with self.get_session() as session:
             roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
             if not roll:
-                print(f"No filly roll found with ID {roll_id}. Cannot change in_use status.")
-                return # TODO return some error to the API caller?
+                logger.error(f"No filly roll found with ID {roll_id}. Cannot change in_use status.")
+                return roll_data
 
             roll.in_use = in_use
             status_str = "in use" if in_use else "not in use"
-            print(f"Set filly roll {roll.descriptive_name} as {status_str}.")
-        # TODO return some confirmation or updated roll info
+            logger.info(f"Set filly roll as {status_str}: {roll.descriptive_name}")
+            roll_data['data'] = roll.to_dict()
+            roll_data['result'] = True
+        return roll_data
 
     def update_roll_weight(self, roll_id, new_weight_grams=None, decr_weight_grams=None):
         """Update the weight of a filly roll.
@@ -434,22 +461,27 @@ class db_connect:
             new_weight_grams (float, optional): New weight in grams. Defaults to None.
             decr_weight_grams (float, optional): Amount to decrease weight by. Defaults to None.
         """
+        roll_data = default_result()
         with self.get_session() as session:
             roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
             if not roll:
-                print(f"No filly roll found with ID {roll_id}. Cannot update weight.")
-                return # TODO return some error to the API caller?
+                logger.error(f"No filly roll found with ID {roll_id}. Cannot update weight.")
+                return roll_data
 
             if new_weight_grams is not None:
                 roll.weight_grams = new_weight_grams
+                roll_data['data'] = roll.to_dict()
+                roll_data['result'] = True
             elif decr_weight_grams is not None:
                 roll.weight_grams = max(0, roll.weight_grams - decr_weight_grams)
+                roll_data['data'] = roll.to_dict()
+                roll_data['result'] = True
             else:
-                print("No weight update parameters provided.")
-                return # TODO return some error to the API caller?
+                logger.error("No weight update parameters provided.")
+                return roll_data
 
-            print(f"Updated weight of filly roll ID {roll_id} to {roll.weight_grams} grams.")
-        # TODO return some confirmation or updated roll info
+            logger.info(f"Updated weight of filly roll to {roll.weight_grams}: {roll.descriptive_name}")
+        return roll_data
 
 def main():
     """Main function to test database connection and configuration."""

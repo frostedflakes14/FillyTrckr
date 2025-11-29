@@ -1,6 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import sys
+from pathlib import Path
+
+common_path = Path(__file__).parent.parent / "common"
+sys.path.insert(0, str(common_path))
+from config import filly_trkr_config
+from common_logging import get_logger
+
+logger = get_logger(__name__)
 
 app = FastAPI()
 
