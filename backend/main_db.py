@@ -38,9 +38,9 @@ from populate_default_tables import (
 
 logger = get_logger()
 
-def default_result():
+def default_roll_result():
     # TODO define an error statement item?
-    return {'result': False, 'data': {}}
+    return {'result': False, 'roll_data': {}}
 
 class db_connect:
     """Database connection manager class.
@@ -354,7 +354,7 @@ class db_connect:
             in_use (bool, optional): Whether the roll is in use. Defaults to False.
         """
         logger.info(f'Inserting new filly roll: type_id={type_id}, brand_id={brand_id}, surface_id={surface_id}, color_id={color_id}, subtype_id={subtype_id}, original_weight_grams={original_weight_grams}, weight_grams={weight_grams}, opened={opened}, in_use={in_use}')
-        roll_data = default_result()
+        roll_data = default_roll_result()
         with self.get_session() as session:
             if weight_grams is None:
                 weight_grams = original_weight_grams
@@ -386,7 +386,7 @@ class db_connect:
             roll_id (int): ID of the filly roll to duplicate.
             original_weight_grams (float, optional): Original weight for the new roll. Defaults to 1000.
         """
-        roll_data = default_result()
+        roll_data = default_roll_result()
         with self.get_session() as session:
             original_roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
             if not original_roll:
@@ -418,7 +418,7 @@ class db_connect:
         Args:
             roll_id (int): ID of the filly roll to mark as opened.
         """
-        roll_data = default_result()
+        roll_data = default_roll_result()
         with self.get_session() as session:
             roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
             if not roll:
@@ -439,7 +439,7 @@ class db_connect:
             roll_id (int): ID of the filly roll to update.
             in_use (bool): New in_use status.
         """
-        roll_data = default_result()
+        roll_data = default_roll_result()
         with self.get_session() as session:
             roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
             if not roll:
@@ -461,7 +461,7 @@ class db_connect:
             new_weight_grams (float, optional): New weight in grams. Defaults to None.
             decr_weight_grams (float, optional): Amount to decrease weight by. Defaults to None.
         """
-        roll_data = default_result()
+        roll_data = default_roll_result()
         with self.get_session() as session:
             roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
             if not roll:
