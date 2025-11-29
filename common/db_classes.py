@@ -25,6 +25,17 @@ class db_filly_types(Base):
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
+    @property
+    def name_formatted(self):
+        return self.name.upper()
+
+    @property
+    def descriptive_name(self):
+        return f"{self.name_formatted} (ID: {self.id})"
+
+    def __repr__(self):
+        return f"<Class {self.__class__.__name__}> {self.descriptive_name}"
+
     def to_dict(self):
         """Convert the filly type to a dictionary representation.
 
@@ -44,6 +55,17 @@ class db_filly_brands(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    @property
+    def name_formatted(self):
+        return self.name.title()
+
+    @property
+    def descriptive_name(self):
+        return f"{self.name_formatted} (ID: {self.id})"
+
+    def __repr__(self):
+        return f"<Class {self.__class__.__name__}> {self.descriptive_name}"
 
     def to_dict(self):
         """Convert the filly type to a dictionary representation.
@@ -66,6 +88,17 @@ class db_filly_surfaces(Base):
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
+    @property
+    def name_formatted(self):
+        return self.name.title()
+
+    @property
+    def descriptive_name(self):
+        return f"{self.name_formatted} (ID: {self.id})"
+
+    def __repr__(self):
+        return f"<Class {self.__class__.__name__}> {self.descriptive_name}"
+
     def to_dict(self):
         """Convert the filly type to a dictionary representation.
 
@@ -87,6 +120,17 @@ class db_filly_colors(Base):
     # TODO maybe add hex code column later
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
+    @property
+    def name_formatted(self):
+        return self.name.title()
+
+    @property
+    def descriptive_name(self):
+        return f"{self.name_formatted} (ID: {self.id})"
+
+    def __repr__(self):
+        return f"<Class {self.__class__.__name__}> {self.descriptive_name}"
+
     def to_dict(self):
         """Convert the filly type to a dictionary representation.
 
@@ -106,6 +150,17 @@ class db_filly_subtypes(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    @property
+    def name_formatted(self):
+        return self.name.title()
+
+    @property
+    def descriptive_name(self):
+        return f"{self.name_formatted} (ID: {self.id})"
+
+    def __repr__(self):
+        return f"<Class {self.__class__.__name__}> {self.descriptive_name}"
 
     def to_dict(self):
         """Convert the filly type to a dictionary representation.
@@ -142,6 +197,12 @@ class db_filly_roll(Base):
     color = relationship("db_filly_colors")
     subtype = relationship("db_filly_subtypes")
 
+    @property
+    def descriptive_name(self):
+        return f"[ID: {self.id}] {self.brand.name_formatted} {self.type.name_formatted}-{self.subtype.name_formatted}, {self.color.name_formatted} ({self.weight_grams}/{self.original_weight_grams}g). Opened: {self.opened}. In Use: {self.in_use}"
+
+    def __repr__(self):
+        return f"<Class {self.__class__.__name__}> {self.descriptive_name}"
     def to_dict(self):
         """Convert the filly roll to a dictionary representation.
 

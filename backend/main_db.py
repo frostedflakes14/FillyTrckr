@@ -17,7 +17,7 @@ from sqlalchemy.exc import OperationalError
 # Add common directory to path for imports
 common_path = Path(__file__).parent.parent / "common"
 sys.path.insert(0, str(common_path))
-
+from config import filly_trkr_config
 from db_base import Base
 from db_classes import (
     db_filly_types,
@@ -36,18 +36,6 @@ from populate_default_tables import (
 )
 
 
-# Load configuration from environment variables
-DB_TYPE = os.getenv("DB_TYPE", "sqlite").lower()
-DB_USERNAME = os.getenv("DB_USERNAME")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME", "fillytrckr")
-
-# SQLite database path
-SQLITE_DB_PATH = Path(__file__).parent.parent / "example.db"
-
-
 class db_connect:
     """Database connection manager class.
 
@@ -55,7 +43,7 @@ class db_connect:
     methods for querying and inserting data.
     """
 
-    def __init__(self):
+    def __init__(self, config=filly_trkr_config()):
         """Initialize the database connection.
 
         Creates the engine, initializes schema if needed, and populates
@@ -63,48 +51,30 @@ class db_connect:
         """
         self.engine = None
         self.SessionLocal = None
+        self._config = config
+        self.db_connected = False
         self._initialize_database()
 
     def _initialize_database(self):
         """Internal method to set up the database engine and schema."""
-        if DB_TYPE == "sqlite":
-            # SQLite configuration
-            db_url = f"sqlite:///{SQLITE_DB_PATH}"
-            print(f"Using SQLite database at: {SQLITE_DB_PATH}")
+        print(self._config.database_info.db_dir)
+        db_url = self._config.database_info._db_connection_string
+        print(db_url)
+        if self._config.database_info.type == 'sqlite':
+            # Ensure the database directory exists
+            db_dir = self._config.database_info.db_dir
+            os.makedirs(db_dir, exist_ok=True)
+
+        try:
             self.engine = create_engine(db_url, echo=False)
-
-            # Check if database exists, if not create it
-            if not SQLITE_DB_PATH.exists():
-                print("Database does not exist. Creating new SQLite database...")
-                Base.metadata.create_all(self.engine)
-                print("Database schema created successfully.")
-            else:
-                print("Existing SQLite database found.")
-
-        elif DB_TYPE in ["postgres", "postgresql"]:
-            # PostgreSQL configuration
-            if not DB_USERNAME or not DB_PASSWORD:
-                raise ValueError(
-                    "PostgreSQL requires DB_USERNAME and DB_PASSWORD environment variables to be set."
-                )
-
-            db_url = f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-            print(f"Attempting to connect to PostgreSQL database at {DB_HOST}:{DB_PORT}/{DB_NAME}")
-
-            try:
-                self.engine = create_engine(db_url, echo=False)
-                # Test the connection
-                with self.engine.connect() as conn:
-                    print("Successfully connected to PostgreSQL database.")
-            except OperationalError as e:
-                raise ConnectionError(
-                    f"Failed to connect to PostgreSQL database. Error: {str(e)}"
-                ) from e
-
-        else:
-            raise ValueError(
-                f"Unsupported DB_TYPE: {DB_TYPE}. Supported types are 'sqlite', 'postgres', or 'postgresql'."
-            )
+            # Test the connection
+            with self.engine.connect() as conn:
+                print("Successfully connected to database.")
+                self.db_connected = True
+        except OperationalError as e:
+            raise ConnectionError(
+                f"Failed to connect to database. Error: {str(e)}"
+            ) from e
 
         # Create session factory
         self.SessionLocal = sessionmaker(bind=self.engine)
@@ -144,6 +114,9 @@ class db_connect:
 
         with self.get_session() as session:
             added_count = 0
+
+            # Make sure the tables exist before querying, if they don't exist, create them
+            Base.metadata.create_all(self.engine)
 
             # Get all existing names in one query per table
             existing_types = {row.name for row in session.query(db_filly_types.name).all()}
@@ -187,7 +160,7 @@ class db_connect:
             else:
                 print("All default data already exists. No new entries added.")
 
-    # TODO create insert and query methods
+    # Database query methods
 
     def get_filly_rolls_in_use(self):
         """Get all in use filament rolls (on the printer)
@@ -330,6 +303,9 @@ class db_connect:
             subtypes = session.query(db_filly_subtypes).all()
             return [s.to_dict() for s in subtypes]
 
+    # Database insert methods
+
+    # TODO remove - this is a dummy function
     def insert_dummy_filly_roll(self):
         """Insert a dummy filly roll for testing purposes."""
         with self.get_session() as session:
@@ -347,12 +323,138 @@ class db_connect:
             session.add(dummy_roll)
             print("Inserted dummy filly roll for testing.")
 
+    def insert_roll(self,
+                    type_id,
+                    brand_id,
+                    surface_id,
+                    color_id,
+                    subtype_id,
+                    original_weight_grams,
+                    weight_grams=None,
+                    opened=False,
+                    in_use=False):
+        """Insert a new filly roll into the database.
+
+        Args:
+            type_id (int): Filament type ID.
+            brand_id (int): Filament brand ID.
+            surface_id (int): Filament surface ID.
+            color_id (int): Filament color ID.
+            subtype_id (int): Filament subtype ID.
+            original_weight_grams (float): Original weight in grams.
+            weight_grams (float, optional): Current weight in grams, if left as None, set to original_weight_grams. Defaults to None.
+            opened (bool, optional): Whether the roll is opened. Defaults to False.
+            in_use (bool, optional): Whether the roll is in use. Defaults to False.
+        """
+        with self.get_session() as session:
+            if weight_grams is None:
+                weight_grams = original_weight_grams
+            new_roll = db_filly_roll(
+                type_id=type_id,
+                brand_id=brand_id,
+                surface_id=surface_id,
+                color_id=color_id,
+                subtype_id=subtype_id,
+                weight_grams=weight_grams,
+                original_weight_grams=original_weight_grams,
+                opened=opened,
+                in_use=in_use
+            )
+            session.add(new_roll)
+            print("Inserted new filly roll into the database.")
+        # TODO return new roll ID
+
+    def insert_dup_roll(self, roll_id, original_weight_grams=1000):
+        """Insert a duplicate of an existing filly roll.
+
+        Args:
+            roll_id (int): ID of the filly roll to duplicate.
+            original_weight_grams (float, optional): Original weight for the new roll. Defaults to 1000.
+        """
+        with self.get_session() as session:
+            original_roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
+            if not original_roll:
+                print(f"No filly roll found with ID {roll_id}. Cannot duplicate.")
+                return # TODO return some error to the API caller?
+
+            dup_roll = db_filly_roll(
+                type_id=original_roll.type_id,
+                brand_id=original_roll.brand_id,
+                surface_id=original_roll.surface_id,
+                color_id=original_roll.color_id,
+                subtype_id=original_roll.subtype_id,
+                weight_grams=original_weight_grams,
+                original_weight_grams=original_weight_grams,
+                opened=False,
+                in_use=False
+            )
+            session.add(dup_roll)
+            print(f"Duplicated filly roll ID {roll_id} as new roll.")
+        # TODO return new roll ID
+
+    def open_roll(self, roll_id):
+        """Mark a filly roll as opened.
+
+        Args:
+            roll_id (int): ID of the filly roll to mark as opened.
+        """
+        with self.get_session() as session:
+            roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
+            if not roll:
+                print(f"No filly roll found with ID {roll_id}. Cannot open.")
+                return # TODO return some error to the API caller?
+
+            roll.opened = True
+            print(f"Marked filly roll ID {roll_id} as opened.")
+        # TODO return some confirmation or updated roll info
+
+    def change_in_use_status(self, roll_id, in_use):
+        """Change the in_use status of a filly roll.
+
+        Args:
+            roll_id (int): ID of the filly roll to update.
+            in_use (bool): New in_use status.
+        """
+        with self.get_session() as session:
+            roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
+            if not roll:
+                print(f"No filly roll found with ID {roll_id}. Cannot change in_use status.")
+                return # TODO return some error to the API caller?
+
+            roll.in_use = in_use
+            status_str = "in use" if in_use else "not in use"
+            print(f"Set filly roll ID {roll_id} as {status_str}.") # TODO change roll_id to use roll name? Need to add roll name
+        # TODO return some confirmation or updated roll info
+
+    def update_roll_weight(self, roll_id, new_weight_grams=None, decr_weight_grams=None):
+        """Update the weight of a filly roll.
+
+        Args:
+            roll_id (int): ID of the filly roll to update.
+            new_weight_grams (float, optional): New weight in grams. Defaults to None.
+            decr_weight_grams (float, optional): Amount to decrease weight by. Defaults to None.
+        """
+        with self.get_session() as session:
+            roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
+            if not roll:
+                print(f"No filly roll found with ID {roll_id}. Cannot update weight.")
+                return # TODO return some error to the API caller?
+
+            if new_weight_grams is not None:
+                roll.weight_grams = new_weight_grams
+            elif decr_weight_grams is not None:
+                roll.weight_grams = max(0, roll.weight_grams - decr_weight_grams)
+            else:
+                print("No weight update parameters provided.")
+                return # TODO return some error to the API caller?
+
+            print(f"Updated weight of filly roll ID {roll_id} to {roll.weight_grams} grams.")
+        # TODO return some confirmation or updated roll info
+
 def main():
     """Main function to test database connection and configuration."""
     print("=" * 60)
     print("Database Configuration Test")
-    print("=" * 60)
-    print(f"DB_TYPE: {DB_TYPE}")
     print("=" * 60)
 
     try:

@@ -1,0 +1,11 @@
+{
+  "TZ": "America/Detroit", // Timezone for the application, default is America/Detroit
+  "database_info": {
+    "type": "postgres", // sqlite or postgres/postgresql, default is sqlite (local file). With sqlite, only db_name is used
+    "host": "192.168.1.1", // only used for postgres
+    "port": "5432", // Default is 5432, only used for postgres
+    "username": "user", // only used for postgres
+    "password": "password", // only used for postgres
+    "db_name": "mydatabase", // sqlite default: example.db. postgres default: mydatabase
+  }
+}
