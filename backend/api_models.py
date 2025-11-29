@@ -1,13 +1,43 @@
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
+from typing import Optional
 
 
-class request_set_roll_in_use(BaseModel):
+class request_roll_set_in_use(BaseModel):
     in_use: bool = True
     class Config:
         json_schema_extra = {
             "example": {
                 "in_use": True
+            }
+        }
+
+class request_roll_duplicate(BaseModel):
+    original_weight_grams: Optional[float] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "original_weight_grams": 1000.0
+            }
+        }
+
+class request_roll_update_weight(BaseModel):
+    new_weight_grams: Optional[float] = None
+    decrease_by_grams: Optional[float] = None
+
+    @model_validator(mode='after')
+    def check_at_least_one_field(self):
+        if self.new_weight_grams is None and self.decrease_by_grams is None:
+            raise ValueError('Either new_weight_grams or decrease_by_grams must be provided')
+        if self.new_weight_grams is not None and self.decrease_by_grams is not None:
+            raise ValueError('Only one of new_weight_grams or decrease_by_grams can be provided, not both')
+        return self
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "new_weight_grams": 500.0
             }
         }
 

@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
 import uvicorn
 import sys
 from pathlib import Path
@@ -11,7 +12,6 @@ from config import filly_trkr_config
 from common_logging import get_logger
 
 logger = get_logger(__name__)
-
 
 
 class FillyAPI:
@@ -49,9 +49,9 @@ class FillyAPI:
     def _register_routes(self):
         """Register all API routes."""
 
-        @self.app.get("/api/v1/filly/get_version")
-        async def get_version():
-            return {"version": "1.0.0"}
+        # @self.app.get("/api/v1/filly/get_version")
+        # async def get_version():
+        #     return {"version": "1.0.0"}
 
         @self.app.get("/api/v1/filly/brands", response_model=api_models.response_get_brands)
         async def get_brands():
@@ -112,7 +112,7 @@ class FillyAPI:
         # POST endpoints to update roll status
 
         @self.app.post("/api/v1/filly/rolls/{roll_id}/set_in_use", response_model=api_models.response_roll_update)
-        async def set_roll_in_use(roll_id: int, data: api_models.request_set_roll_in_use):
+        async def roll_set_in_use(roll_id: int, data: api_models.request_roll_set_in_use):
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
 
@@ -120,6 +120,48 @@ class FillyAPI:
             if not result.get('result', False):
                 raise HTTPException(status_code=404, detail="Roll not found or could not update") # TODO consider having the db function return the error message
             return result
+
+        @self.app.post("/api/v1/filly/rolls/{roll_id}/duplicate", response_model=api_models.response_roll_update)
+        async def roll_duplicate(roll_id: int, data: Optional[api_models.request_roll_duplicate] = None):
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+
+            if data and data.original_weight_grams is not None:
+                result = self.db.insert_dup_roll(roll_id, original_weight_grams=data.original_weight_grams)
+            else:
+                result = self.db.insert_dup_roll(roll_id)
+            if not result.get('result', False):
+                raise HTTPException(status_code=404, detail="Roll not found or could not duplicate")
+            return result
+
+        @self.app.post("/api/v1/filly/rolls/{roll_id}/set_opened", response_model=api_models.response_roll_update)
+        async def roll_set_opened(roll_id: int):
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+
+            result = self.db.open_roll(roll_id)
+            if not result.get('result', False):
+                raise HTTPException(status_code=404, detail="Roll not found or could not update")
+            return result
+
+        @self.app.post("/api/v1/filly/rolls/{roll_id}/update_weight", response_model=api_models.response_roll_update)
+        async def roll_update_weight(roll_id: int, data: api_models.request_roll_update_weight):
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+
+            # Update roll weight can be set or can be decreased depending on what is in data
+            if data.new_weight_grams is not None:
+                result = self.db.update_roll_weight(roll_id, new_weight_grams=data.new_weight_grams)
+            elif data.decrease_by_grams is not None:
+                result = self.db.update_roll_weight(roll_id, decr_weight_grams=data.decrease_by_grams)
+            else:
+                raise HTTPException(status_code=400, detail="No weight update data provided")
+
+            if not result.get('result', False):
+                raise HTTPException(status_code=404, detail="Roll not found or could not update")
+            return result
+
+        # TODO api endpoints to make: insert_roll, get rolls-filtered
 
     def run(self, host="0.0.0.0", port=8000):
         """Run the FastAPI application.
