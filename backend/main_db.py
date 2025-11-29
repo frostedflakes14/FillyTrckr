@@ -374,7 +374,7 @@ class db_connect:
             logger.info(f"Successfully inserted new filly roll: {new_roll.descriptive_name}")
 
             # Get the roll data before session closes
-            roll_data['data'] = new_roll.to_dict()
+            roll_data['roll_data'] = new_roll.to_dict()
             roll_data['result'] = True
 
         return roll_data
@@ -391,7 +391,7 @@ class db_connect:
             original_roll = session.query(db_filly_roll).filter_by(id=roll_id).first()
             if not original_roll:
                 logger.error(f"No filly roll found with ID {roll_id}. Cannot duplicate.")
-                return # TODO return some error to the API caller?
+                return roll_data
 
             dup_roll = db_filly_roll(
                 type_id=original_roll.type_id,
@@ -407,10 +407,9 @@ class db_connect:
             session.add(dup_roll)
             session.flush()  # This assigns the ID and makes relationships accessible
             logger.info(f"Successfully duplicated filly roll: {dup_roll.descriptive_name}")
-            roll_data['data'] = dup_roll.to_dict()
+            roll_data['roll_data'] = dup_roll.to_dict()
             roll_data['result'] = True
         return roll_data
-        # TODO return new roll ID
 
     def open_roll(self, roll_id):
         """Mark a filly roll as opened.
@@ -427,7 +426,7 @@ class db_connect:
 
             roll.opened = True
             logger.info(f"Marked filly roll as opened: {roll.descriptive_name}")
-            roll_data['data'] = roll.to_dict()
+            roll_data['roll_data'] = roll.to_dict()
             roll_data['result'] = True
 
         return roll_data
@@ -449,7 +448,7 @@ class db_connect:
             roll.in_use = in_use
             status_str = "in use" if in_use else "not in use"
             logger.info(f"Set filly roll as {status_str}: {roll.descriptive_name}")
-            roll_data['data'] = roll.to_dict()
+            roll_data['roll_data'] = roll.to_dict()
             roll_data['result'] = True
         return roll_data
 
@@ -470,11 +469,11 @@ class db_connect:
 
             if new_weight_grams is not None:
                 roll.weight_grams = new_weight_grams
-                roll_data['data'] = roll.to_dict()
+                roll_data['roll_data'] = roll.to_dict()
                 roll_data['result'] = True
             elif decr_weight_grams is not None:
                 roll.weight_grams = max(0, roll.weight_grams - decr_weight_grams)
-                roll_data['data'] = roll.to_dict()
+                roll_data['roll_data'] = roll.to_dict()
                 roll_data['result'] = True
             else:
                 logger.error("No weight update parameters provided.")
