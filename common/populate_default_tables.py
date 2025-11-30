@@ -15,14 +15,6 @@ filly_brands_defaults = [
     'esun',
 ]
 
-filly_surfaces_defaults = [
-    'basic',
-    'matte',
-    'silk',
-    'metal',
-    'wood',
-]
-
 filly_colors_defaults = [
     'white',
     'black',
@@ -47,6 +39,9 @@ filly_colors_defaults = [
 ]
 
 filly_subtypes_defaults = [
+    'basic',
+    'matte',
+    'metal',
     'silk',
     'glow-in-the-dark',
     'carbon fiber',

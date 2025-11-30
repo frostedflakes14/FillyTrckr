@@ -23,7 +23,6 @@ from db_base import Base
 from db_classes import (
     db_filly_types,
     db_filly_brands,
-    db_filly_surfaces,
     db_filly_colors,
     db_filly_subtypes,
     db_filly_roll
@@ -31,7 +30,6 @@ from db_classes import (
 from populate_default_tables import (
     filly_types_defaults,
     filly_brands_defaults,
-    filly_surfaces_defaults,
     filly_colors_defaults,
     filly_subtypes_defaults
 )
@@ -127,7 +125,6 @@ class db_connect:
             # Get all existing names in one query per table
             existing_types = {row.name for row in session.query(db_filly_types.name).all()}
             existing_brands = {row.name for row in session.query(db_filly_brands.name).all()}
-            existing_surfaces = {row.name for row in session.query(db_filly_surfaces.name).all()}
             existing_colors = {row.name for row in session.query(db_filly_colors.name).all()}
             existing_subtypes = {row.name for row in session.query(db_filly_subtypes.name).all()}
 
@@ -141,12 +138,6 @@ class db_connect:
             for brand_name in filly_brands_defaults:
                 if brand_name not in existing_brands:
                     session.add(db_filly_brands(name=brand_name))
-                    added_count += 1
-
-            # Populate filly_surfaces
-            for surface_name in filly_surfaces_defaults:
-                if surface_name not in existing_surfaces:
-                    session.add(db_filly_surfaces(name=surface_name))
                     added_count += 1
 
             # Populate filly_colors
@@ -203,8 +194,6 @@ class db_connect:
                                       type_id=None,
                                       brand=None,
                                       brand_id=None,
-                                      surface=None,
-                                      surface_id=None,
                                       color=None,
                                       color_id=None,
                                       subtype=None,
@@ -219,8 +208,6 @@ class db_connect:
             type_id (int, optional): Filament type ID to filter by.
             brand (str, optional): Filament brand name to filter by.
             brand_id (int, optional): Filament brand ID to filter by.
-            surface (str, optional): Filament surface name to filter by.
-            surface_id (int, optional): Filament surface ID to filter by.
             color (str, optional): Filament color name to filter by.
             color_id (int, optional): Filament color ID to filter by.
             subtype (str, optional): Filament subtype name to filter by.
@@ -228,7 +215,7 @@ class db_connect:
             opened (bool, optional): Filter by opened status.
             in_use (bool, optional): Filter by in use status.
         """
-        logger.info(f'Getting active filly rolls with filters: type={type}, type_id={type_id}, brand={brand}, brand_id={brand_id}, surface={surface}, surface_id={surface_id}, color={color}, color_id={color_id}, subtype={subtype}, subtype_id={subtype_id}, opened={opened}, in_use={in_use}')
+        logger.info(f'Getting active filly rolls with filters: type={type}, type_id={type_id}, brand={brand}, brand_id={brand_id}, color={color}, color_id={color_id}, subtype={subtype}, subtype_id={subtype_id}, opened={opened}, in_use={in_use}')
         with self.get_session() as session:
             query = session.query(db_filly_roll).filter(db_filly_roll.weight_grams > 0)
 
@@ -240,10 +227,6 @@ class db_connect:
                 query = query.join(db_filly_brands).filter(db_filly_brands.name == brand)
             if brand_id:
                 query = query.filter(db_filly_roll.brand_id == brand_id)
-            if surface:
-                query = query.join(db_filly_surfaces).filter(db_filly_surfaces.name == surface)
-            if surface_id:
-                query = query.filter(db_filly_roll.surface_id == surface_id)
             if color:
                 query = query.join(db_filly_colors).filter(db_filly_colors.name == color)
             if color_id:
@@ -280,16 +263,6 @@ class db_connect:
             brands = session.query(db_filly_brands).all()
             return [b.to_dict() for b in brands]
 
-    def get_filly_surfaces(self):
-        """Get all filament surfaces.
-
-        Returns:
-            Dict of filament surfaces
-        """
-        with self.get_session() as session:
-            surfaces = session.query(db_filly_surfaces).all()
-            return [s.to_dict() for s in surfaces]
-
     def get_filly_colors(self):
         """Get all filament colors.
 
@@ -319,7 +292,6 @@ class db_connect:
             dummy_roll = db_filly_roll(
                 type_id=1,
                 brand_id=1,
-                surface_id=1,
                 color_id=1,
                 subtype_id=1,
                 weight_grams=500,
@@ -333,7 +305,6 @@ class db_connect:
     def insert_roll(self,
                     type_id,
                     brand_id,
-                    surface_id,
                     color_id,
                     subtype_id,
                     original_weight_grams,
@@ -345,7 +316,6 @@ class db_connect:
         Args:
             type_id (int): Filament type ID.
             brand_id (int): Filament brand ID.
-            surface_id (int): Filament surface ID.
             color_id (int): Filament color ID.
             subtype_id (int): Filament subtype ID.
             original_weight_grams (float): Original weight in grams.
@@ -353,7 +323,7 @@ class db_connect:
             opened (bool, optional): Whether the roll is opened. Defaults to False.
             in_use (bool, optional): Whether the roll is in use. Defaults to False.
         """
-        logger.info(f'Inserting new filly roll: type_id={type_id}, brand_id={brand_id}, surface_id={surface_id}, color_id={color_id}, subtype_id={subtype_id}, original_weight_grams={original_weight_grams}, weight_grams={weight_grams}, opened={opened}, in_use={in_use}')
+        logger.info(f'Inserting new filly roll: type_id={type_id}, brand_id={brand_id}, color_id={color_id}, subtype_id={subtype_id}, original_weight_grams={original_weight_grams}, weight_grams={weight_grams}, opened={opened}, in_use={in_use}')
         roll_data = default_roll_result()
         with self.get_session() as session:
             if weight_grams is None:
@@ -361,7 +331,6 @@ class db_connect:
             new_roll = db_filly_roll(
                 type_id=type_id,
                 brand_id=brand_id,
-                surface_id=surface_id,
                 color_id=color_id,
                 subtype_id=subtype_id,
                 weight_grams=weight_grams,
@@ -396,7 +365,6 @@ class db_connect:
             dup_roll = db_filly_roll(
                 type_id=original_roll.type_id,
                 brand_id=original_roll.brand_id,
-                surface_id=original_roll.surface_id,
                 color_id=original_roll.color_id,
                 subtype_id=original_roll.subtype_id,
                 weight_grams=original_weight_grams,

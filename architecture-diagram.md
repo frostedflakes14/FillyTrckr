@@ -58,7 +58,6 @@
               │  - filly_colors                         │
               │  - filly_brands                         │
               │  - filly_subtypes                       │
-              │  - filly_surfaces                       │
               │                                         │
               │  Port: 5432 (internal only)             │
               │  Container Name: postgres               │

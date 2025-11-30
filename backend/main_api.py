@@ -67,13 +67,6 @@ class FillyAPI:
             types = self.db.get_filly_types()
             return {"types": types}
 
-        @self.app.get("/api/v1/filly/surfaces", response_model=api_models.response_get_surfaces)
-        async def get_surfaces():
-            if not self.db:
-                raise HTTPException(status_code=500, detail="Database not connected")
-            surfaces = self.db.get_filly_surfaces()
-            return {"surfaces": surfaces}
-
         @self.app.get("/api/v1/filly/colors", response_model=api_models.response_get_colors)
         async def get_colors():
             if not self.db:

@@ -119,34 +119,12 @@ class response_get_subtypes(BaseModel):
             }
         }
 
-class response_get_surfaces(BaseModel):
-    surfaces: list[dict]
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "surfaces": [
-                    {
-                        "id": 1,
-                        "name": "basic",
-                        "created_at": "2024-01-01T12:00:00Z"
-                    },
-                    {
-                        "id": 2,
-                        "name": "matte",
-                        "created_at": "2024-01-02T12:00:00Z"
-                    }
-                ]
-            }
-        }
-
 class response_roll_data(BaseModel):
     id: int
     type: str
     type_id: int
     brand: str
     brand_id: int
-    surface: str
-    surface_id: int
     color: str
     color_id: int
     subtype: str
@@ -166,8 +144,6 @@ class response_roll_data(BaseModel):
                 "type_id": 1,
                 "brand": "bambu",
                 "brand_id": 1,
-                "surface": "matte",
-                "surface_id": 1,
                 "color": "blue",
                 "color_id": 1,
                 "subtype": "basic",
@@ -193,8 +169,6 @@ class response_get_rolls(BaseModel):
                         "type_id": 1,
                         "brand": "bambu",
                         "brand_id": 1,
-                        "surface": "matte",
-                        "surface_id": 1,
                         "color": "blue",
                         "color_id": 1,
                         "subtype": "basic",
@@ -224,8 +198,6 @@ class response_roll_update(BaseModel):
                     "type_id": 1,
                     "brand": "bambu",
                     "brand_id": 1,
-                    "surface": "matte",
-                    "surface_id": 1,
                     "color": "blue",
                     "color_id": 1,
                     "subtype": "basic",

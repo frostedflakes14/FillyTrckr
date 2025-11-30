@@ -17,16 +17,15 @@ Add filly type/subtype/brand/etc (maybe one endpoint, maybe more)
 Add filly color
 Delete filly type/subtype/brand/etc (maybe one endpoint, maybe more)
 Delete filly color
-search filly by any characteristic (type, color, brand, subtype, surface, active/not active, opened/not opened, etc)
+search filly by any characteristic (type, color, brand, subtype, active/not active, opened/not opened, etc)
 import/export to be added later
 API will be fast api
 
 Characteristics of filly (for python class):
 Type (pla, petg, abs)
-Surface (matte, regular shiny silk)
 Color
 Brand
-Subtype (HF, silk, plus, metal, wood)
+Subtype (Basic, Matte, HF, silk, plus, metal, wood)
 Original spool quantity (grams)
 Opened/not opened flag
 Current quantity (grams)
@@ -35,7 +34,7 @@ Filament length and diameter are not necessary
 
 DB tables:
 Rolls of filly (this table should have a column for each characteristic above) - these will end up being updated by the front end (through backend rest api) - ie want a row for all filaments that match a specific type/color/brand/etc, and be able to add more extra spools to the bank, but also update the current quantity of all active spools
-Filly types (color combo, type, surface finish, etc)
+Filly types (color combo, type, subtype, etc)
   Maybe break the filly types into separate tables
 Want to be able to use those as dropdowns, and make these tables updatable
 Each table should have created_at column, and for filly rolls table an updated_at column
