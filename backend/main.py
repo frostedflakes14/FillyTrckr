@@ -17,7 +17,7 @@ from main_api import FillyAPI
 
 logger = get_logger(__name__)
 
-
+# TODO add config
 def main():
     """Initialize and run the Filly Tracker application."""
     logger.info("Starting Filly Tracker application...")

@@ -20,9 +20,10 @@ class FillyAPI:
     Manages the FastAPI instance and database connection.
     """
 
-    def __init__(self):
+    def __init__(self, config=filly_trkr_config()):
         """Initialize the FastAPI application."""
-        self.app = FastAPI(title="Filly Tracker API", version="1.0.0")
+        self._config = config
+        self.app = FastAPI(title="Filly Trckr API", version="1.0.0")
         self.db = None
 
         # Configure CORS
@@ -156,13 +157,17 @@ class FillyAPI:
 
         # TODO api endpoints to make: insert_roll, get rolls-filtered
 
-    def run(self, host="0.0.0.0", port=8000):
+    def run(self, host=None, port=None):
         """Run the FastAPI application.
 
         Args:
-            host (str): Host to bind to. Defaults to "0.0.0.0".
-            port (int): Port to bind to. Defaults to 8000.
+            host (str): Host to bind to. Defaults to "0.0.0.0" (from config)
+            port (int): Port to bind to. Defaults to 8000 (from config)
         """
+        if host is None:
+            host = self._config.api_info.host
+        if port is None:
+            port = self._config.api_info.port
         uvicorn.run(self.app, host=host, port=port)
 
 

@@ -101,11 +101,11 @@
 │  Process:                                                               │
 │    1. Build Docker Image                                                │
 │    2. Tag Image                                                         │
-│    3. Push to 192.168.0.xx:5000 (Self-hosted Docker Registry)          │
+│    3. Push to 192.168.0.xx:5000 (Self-hosted Docker Registry)           │
 │                                                                         │
 │  Image Names:                                                           │
-│    - 192.168.0.xx:5000/fillytrckr-frontend:latest                      │
-│    - 192.168.0.xx:5000/fillytrckr-backend:latest                       │
+│    - 192.168.0.xx:5000/fillytrckr-frontend:latest                       │
+│    - 192.168.0.xx:5000/fillytrckr-backend:latest                        │
 └─────────────────────────────────────────────────────────────────────────┘
 
 

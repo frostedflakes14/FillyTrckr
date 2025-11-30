@@ -62,10 +62,23 @@ class filly_trkr_config:
             else:
                 raise ValueError(f"Unsupported database type: {self.type}")
 
+    class API_Info():
+        def __init__(self, d, config_filepath):
+            self._d = d
+            self._config_filepath = config_filepath
+
+        @property
+        def host(self):
+            return self._d.get("host", 'localhost')
+
+        @property
+        def port(self):
+            return self._d.get("port", 8000)
+
     def __init__(self, config_filepath=None):
         self._config = self._load_config(config_filepath)
         if config_filepath is None:
-            config_filepath = __file__
+            self._config_filepath = __file__
         else:
             self._config_filepath = config_filepath
 
@@ -112,4 +125,8 @@ class filly_trkr_config:
     @property
     def database_info(self):
         return self.DatabaseInfo(self._config.get("database_info", {}), self._config_filepath)
+
+    @property
+    def api_info(self):
+        return self.API_Info(self._config.get("api_info", {}), self._config_filepath)
 
