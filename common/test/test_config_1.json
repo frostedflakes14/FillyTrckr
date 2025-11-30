@@ -1,0 +1,8 @@
+{
+  "TZ": "America/Detroit",
+  "database_info": {
+    "type": "sqlite",
+    "db_name": "test_sqlite.db",
+    "db_dir": "."
+  }
+}

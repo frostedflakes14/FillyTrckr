@@ -11,8 +11,9 @@ class filly_trkr_config:
     """
 
     class DatabaseInfo():
-        def __init__(self, d):
+        def __init__(self, d, config_filepath):
             self._d = d
+            self._config_filepath = config_filepath
 
         @property
         def type(self):
@@ -44,7 +45,11 @@ class filly_trkr_config:
         @property
         def db_dir(self):
             if self.type == 'sqlite':
-                return self._d.get('db_dir', os.path.join(os.path.dirname(os.path.dirname(__file__)), 'db'))
+                # use relative path from config file location
+                db_dir = self._d.get('db_dir', '.')
+                if not os.path.isabs(db_dir):
+                    db_dir = os.path.join(os.path.dirname(self._config_filepath), db_dir)
+                return db_dir
             else:
                 return None
 
@@ -57,12 +62,17 @@ class filly_trkr_config:
             else:
                 raise ValueError(f"Unsupported database type: {self.type}")
 
-    def __init__(self):
-        self._config = self._load_config()
+    def __init__(self, config_filepath=None):
+        self._config = self._load_config(config_filepath)
+        if config_filepath is None:
+            config_filepath = __file__
+        else:
+            self._config_filepath = config_filepath
 
-    def _load_config(self, config_filepath=None):
+    def _load_config(self, config_filepath):
         config = {}
         if config_filepath is None:
+            # by default, it looks for it in the same directory as this file
             config_filepath = os.path.join(os.path.dirname(__file__), "config.json")
 
         if os.path.exists(config_filepath):
@@ -101,5 +111,5 @@ class filly_trkr_config:
 
     @property
     def database_info(self):
-        return self.DatabaseInfo(self._config.get("database_info", {}))
+        return self.DatabaseInfo(self._config.get("database_info", {}), self._config_filepath)
 

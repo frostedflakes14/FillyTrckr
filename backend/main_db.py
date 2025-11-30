@@ -159,6 +159,22 @@ class db_connect:
 
     # Database query methods
 
+    def get_filly_roll_id(self, id):
+        """Get a filly roll by its ID.
+
+        Args:
+            id (int): ID of the filly roll.
+
+        Returns:
+            dict: Filly roll data as a dictionary, or None if not found.
+        """
+        with self.get_session() as session:
+            roll = session.query(db_filly_roll).filter_by(id=id).first()
+            if roll:
+                return roll.to_dict()
+            else:
+                return None
+
     def get_filly_rolls_in_use(self):
         """Get all in use filament rolls (on the printer)
 

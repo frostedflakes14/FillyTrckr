@@ -1,0 +1,11 @@
+{
+  "TZ": "America/Detroit",
+  "database_info": {
+    "type": "postgres",
+    "host": "localhost",
+    "port": "5432",
+    "username": "testuser",
+    "password": "testpass",
+    "db_name": "testdb"
+  }
+}
