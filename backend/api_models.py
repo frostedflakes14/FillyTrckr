@@ -59,6 +59,26 @@ class request_roll_add(BaseModel): # TODO finish updating this
             }
         }
 
+    def get(self, item, default=None):
+        return getattr(self, item, default)
+
+class request_roll_filter(BaseModel):
+    brand_id: Optional[int] = None
+    type_id: Optional[int] = None
+    color_id: Optional[int] = None
+    subtype_id: Optional[int] = None
+    opened: Optional[bool] = None
+    in_use: Optional[bool] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "brand_id": 1,
+                "type_id": 2,
+                "opened": True
+            }
+        }
+
 class response_get_brands(BaseModel):
     brands: list[dict]
     class Config:

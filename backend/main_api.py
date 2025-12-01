@@ -23,7 +23,32 @@ class FillyAPI:
     def __init__(self, config=filly_trkr_config()):
         """Initialize the FastAPI application."""
         self._config = config
-        self.app = FastAPI(title="Filly Trckr API", version="1.0.0")
+
+        # Define tag metadata with order and descriptions
+        tags_metadata = [
+            {
+                "name": "Get Rolls",
+                "description": "Retrieve filament rolls with various filters and criteria.",
+            },
+            {
+                "name": "Create Rolls",
+                "description": "Add new rolls or duplicate existing ones.",
+            },
+            {
+                "name": "Update Rolls",
+                "description": "Modify existing roll properties such as weight, status, and usage.",
+            },
+            {
+                "name": "Get Roll Properties",
+                "description": "Retrieve available brands, types, colors, and subtypes for filament rolls.",
+            },
+        ]
+
+        self.app = FastAPI(
+            title="Filly Trckr API",
+            version="1.0.0",
+            openapi_tags=tags_metadata
+        )
         self.db = None
 
         # Configure CORS
@@ -251,7 +276,130 @@ class FillyAPI:
                 raise HTTPException(status_code=400, detail="Failed to add roll")
             return result
 
-        # TODO api endpoints to make: get rolls-filtered
+        # Helper function for filter logic
+        def _get_filtered_rolls_logic(
+                data: Optional[api_models.request_roll_filter] = None,
+                brand_id: Optional[int] = None,
+                type_id: Optional[int] = None,
+                color_id: Optional[int] = None,
+                subtype_id: Optional[int] = None,
+                opened: Optional[bool] = None,
+                in_use: Optional[bool] = None,
+            ):
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+
+            # Start with query parameters, then override with JSON body values if provided
+            filters = {
+                "brand_id": brand_id,
+                "type_id": type_id,
+                "color_id": color_id,
+                "subtype_id": subtype_id,
+                "opened": opened,
+                "in_use": in_use,
+            }
+
+            # Override with JSON body values if provided
+            if data:
+                if data.brand_id is not None:
+                    filters["brand_id"] = data.brand_id
+                if data.type_id is not None:
+                    filters["type_id"] = data.type_id
+                if data.color_id is not None:
+                    filters["color_id"] = data.color_id
+                if data.subtype_id is not None:
+                    filters["subtype_id"] = data.subtype_id
+                if data.opened is not None:
+                    filters["opened"] = data.opened
+                if data.in_use is not None:
+                    filters["in_use"] = data.in_use
+
+            # clean the inputs, set all text to lowercase (or None), a validate ints/bools as needed
+            if filters["brand_id"] is not None:
+                try:
+                    filters["brand_id"] = int(filters["brand_id"])
+                except ValueError:
+                    raise HTTPException(status_code=400, detail="Invalid brand_id value")
+            if filters["type_id"] is not None:
+                try:
+                    filters["type_id"] = int(filters["type_id"])
+                except ValueError:
+                    raise HTTPException(status_code=400, detail="Invalid type_id value")
+            if filters["color_id"] is not None:
+                try:
+                    filters["color_id"] = int(filters["color_id"])
+                except ValueError:
+                    raise HTTPException(status_code=400, detail="Invalid color_id value")
+            if filters["subtype_id"] is not None:
+                try:
+                    filters["subtype_id"] = int(filters["subtype_id"])
+                except ValueError:
+                    raise HTTPException(status_code=400, detail="Invalid subtype_id value")
+            if filters["opened"] is not None:
+                if isinstance(filters["opened"], str):
+                    if filters["opened"].lower() in ['true', '1', 'yes']:
+                        filters["opened"] = True
+                    elif filters["opened"].lower() in ['false', '0', 'no']:
+                        filters["opened"] = False
+                    else:
+                        raise HTTPException(status_code=400, detail="Invalid opened value")
+            if filters["in_use"] is not None:
+                if isinstance(filters["in_use"], str):
+                    if filters["in_use"].lower() in ['true', '1', 'yes']:
+                        filters["in_use"] = True
+                    elif filters["in_use"].lower() in ['false', '0', 'no']:
+                        filters["in_use"] = False
+                    else:
+                        raise HTTPException(status_code=400, detail="Invalid in_use value")
+
+            rolls = self.db.get_filly_rolls_active_filter( # TODO Clean the inputs
+                type_id=filters["type_id"],
+                brand_id=filters["brand_id"],
+                color_id=filters["color_id"],
+                subtype_id=filters["subtype_id"],
+                opened=filters["opened"],
+                in_use=filters["in_use"],
+            )
+            return {"rolls": rolls}
+
+        @self.app.get(
+                "/api/v1/filly/rolls/filter",
+                response_model=api_models.response_get_rolls,
+                summary="Get active filly rolls with filters (GET)",
+                description="Retrieve a list of filament rolls in the database based on provided filters via query parameters.",
+                tags=["Get Rolls"],
+                )
+        async def get_filtered_rolls_get(
+                brand_id: Optional[int] = None,
+                type_id: Optional[int] = None,
+                color_id: Optional[int] = None,
+                subtype_id: Optional[int] = None,
+                opened: Optional[bool] = None,
+                in_use: Optional[bool] = None,
+            ):
+            return _get_filtered_rolls_logic(
+                None, brand_id, type_id, color_id, subtype_id, opened, in_use
+            )
+
+        @self.app.post(
+                "/api/v1/filly/rolls/filter",
+                response_model=api_models.response_get_rolls,
+                summary="Get active filly rolls with filters (POST)",
+                description="Retrieve a list of filament rolls in the database based on provided filters. Accepts filters from both query parameters and JSON body. JSON body values take precedence over query parameters.",
+                tags=["Get Rolls"],
+                )
+        async def get_filtered_rolls_post(
+                data: Optional[api_models.request_roll_filter] = None,
+                brand_id: Optional[int] = None,
+                type_id: Optional[int] = None,
+                color_id: Optional[int] = None,
+                subtype_id: Optional[int] = None,
+                opened: Optional[bool] = None,
+                in_use: Optional[bool] = None,
+            ):
+            return _get_filtered_rolls_logic(
+                data, brand_id, type_id, color_id, subtype_id, opened, in_use
+            )
 
     def run(self, host=None, port=None):
         """Run the FastAPI application.
