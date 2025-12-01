@@ -41,6 +41,24 @@ class request_roll_update_weight(BaseModel):
             }
         }
 
+class request_roll_add(BaseModel): # TODO finish updating this
+    type_id: int
+    brand_id: int
+    color_id: int
+    subtype_id: int
+    original_weight_grams: float
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "type_id": 1,
+                "brand_id": 1,
+                "color_id": 1,
+                "subtype_id": 1,
+                "original_weight_grams": 1000.0
+            }
+        }
+
 class response_get_brands(BaseModel):
     brands: list[dict]
     class Config:

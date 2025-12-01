@@ -54,49 +54,91 @@ class FillyAPI:
         # async def get_version():
         #     return {"version": "1.0.0"}
 
-        @self.app.get("/api/v1/filly/brands", response_model=api_models.response_get_brands)
+        @self.app.get(
+                "/api/v1/filly/brands",
+                response_model=api_models.response_get_brands,
+                summary="Get all filly brands",
+                description="Retrieve a list of all filament brands in the database.",
+                tags=["Get Roll Properties"],
+                )
         async def get_brands():
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
             brands = self.db.get_filly_brands()
             return {"brands": brands}
 
-        @self.app.get("/api/v1/filly/types", response_model=api_models.response_get_types)
+        @self.app.get(
+                "/api/v1/filly/types",
+                response_model=api_models.response_get_types,
+                summary="Get all filly types",
+                description="Retrieve a list of all filament types in the database.",
+                tags=["Get Roll Properties"],
+                )
         async def get_types():
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
             types = self.db.get_filly_types()
             return {"types": types}
 
-        @self.app.get("/api/v1/filly/colors", response_model=api_models.response_get_colors)
+        @self.app.get(
+                "/api/v1/filly/colors",
+                response_model=api_models.response_get_colors,
+                summary="Get all filly colors",
+                description="Retrieve a list of all filament colors in the database.",
+                tags=["Get Roll Properties"],
+                )
         async def get_colors():
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
             colors = self.db.get_filly_colors()
             return {"colors": colors}
 
-        @self.app.get("/api/v1/filly/subtypes", response_model=api_models.response_get_subtypes)
+        @self.app.get(
+                "/api/v1/filly/subtypes",
+                response_model=api_models.response_get_subtypes,
+                summary="Get all filly subtypes",
+                description="Retrieve a list of all filament subtypes in the database.",
+                tags=["Get Roll Properties"],
+                )
         async def get_subtypes():
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
             subtypes = self.db.get_filly_subtypes()
             return {"subtypes": subtypes}
 
-        @self.app.get("/api/v1/filly/rolls/all", response_model=api_models.response_get_rolls)
+        @self.app.get(
+                "/api/v1/filly/rolls/all",
+                response_model=api_models.response_get_rolls,
+                summary="Get all filly rolls",
+                description="Retrieve a list of all filament rolls in the database.",
+                tags=["Get Rolls"],
+                )
         async def get_all_rolls():
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
             rolls = self.db.get_filly_rolls_all()
             return {"rolls": rolls}
 
-        @self.app.get("/api/v1/filly/rolls/active", response_model=api_models.response_get_rolls)
+        @self.app.get(
+                "/api/v1/filly/rolls/active",
+                response_model=api_models.response_get_rolls,
+                summary="Get active (weight>0) filly rolls",
+                description="Retrieve a list of all active filament rolls in the database.",
+                tags=["Get Rolls"],
+                )
         async def get_active_rolls():
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
             rolls = self.db.get_filly_rolls_active()
             return {"rolls": rolls}
 
-        @self.app.get("/api/v1/filly/rolls/in_use", response_model=api_models.response_get_rolls)
+        @self.app.get(
+                "/api/v1/filly/rolls/in_use",
+                response_model=api_models.response_get_rolls,
+                summary="Get in-use (on printer) filly rolls",
+                description="Retrieve a list of all in-use filament rolls in the database.",
+                tags=["Get Rolls"],
+                )
         async def get_in_use_rolls():
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
@@ -105,7 +147,13 @@ class FillyAPI:
 
         # POST endpoints to update roll status
 
-        @self.app.post("/api/v1/filly/rolls/{roll_id}/set_in_use", response_model=api_models.response_roll_update)
+        @self.app.post(
+                "/api/v1/filly/rolls/{roll_id}/set_in_use",
+                response_model=api_models.response_roll_update,
+                summary="Set roll in-use status",
+                description="Set the in-use status of a specific roll to True or False.",
+                tags=["Update Rolls"],
+                )
         async def roll_set_in_use(roll_id: int, data: api_models.request_roll_set_in_use):
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
@@ -115,7 +163,13 @@ class FillyAPI:
                 raise HTTPException(status_code=404, detail="Roll not found or could not update") # TODO consider having the db function return the error message
             return result
 
-        @self.app.post("/api/v1/filly/rolls/{roll_id}/duplicate", response_model=api_models.response_roll_update)
+        @self.app.post(
+                "/api/v1/filly/rolls/{roll_id}/duplicate",
+                response_model=api_models.response_roll_update,
+                summary="Duplicate a roll",
+                description="Create a duplicate of a specific roll. Optionally, set a new original weight.",
+                tags=["Create Rolls"],
+                )
         async def roll_duplicate(roll_id: int, data: Optional[api_models.request_roll_duplicate] = None):
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
@@ -128,7 +182,13 @@ class FillyAPI:
                 raise HTTPException(status_code=404, detail="Roll not found or could not duplicate")
             return result
 
-        @self.app.post("/api/v1/filly/rolls/{roll_id}/set_opened", response_model=api_models.response_roll_update)
+        @self.app.post(
+                "/api/v1/filly/rolls/{roll_id}/set_opened",
+                response_model=api_models.response_roll_update,
+                summary="Set a roll as opened",
+                description="Set the opened status of a specific roll to True. Not capable of setting it to False.",
+                tags=["Update Rolls"],
+                )
         async def roll_set_opened(roll_id: int):
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
@@ -138,7 +198,13 @@ class FillyAPI:
                 raise HTTPException(status_code=404, detail="Roll not found or could not update")
             return result
 
-        @self.app.post("/api/v1/filly/rolls/{roll_id}/update_weight", response_model=api_models.response_roll_update)
+        @self.app.post(
+                "/api/v1/filly/rolls/{roll_id}/update_weight",
+                response_model=api_models.response_roll_update,
+                summary="Update the weight of a roll",
+                description="Update the weight of a specific roll by setting a new weight or decreasing the current weight.",
+                tags=["Update Rolls"],
+                )
         async def roll_update_weight(roll_id: int, data: api_models.request_roll_update_weight):
             if not self.db:
                 raise HTTPException(status_code=500, detail="Database not connected")
@@ -155,7 +221,37 @@ class FillyAPI:
                 raise HTTPException(status_code=404, detail="Roll not found or could not update")
             return result
 
-        # TODO api endpoints to make: insert_roll, get rolls-filtered
+        @self.app.post(
+                "/api/v1/filly/rolls/add",
+                response_model=api_models.response_roll_update,
+                summary="Add a new roll",
+                description="Requires all fields for a new roll, and adds it to the database.",
+                tags=["Create Rolls"],
+                )
+        async def roll_add(data: api_models.request_roll_add):
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+
+            required_items = [data.type_id, data.brand_id, data.color_id, data.subtype_id, data.original_weight_grams]
+            if not all(item is not None for item in required_items):
+                raise HTTPException(status_code=400, detail="Missing required fields to add roll")
+
+            # TODO clean the inputs
+            result = self.db.insert_roll(
+                type_id=data.type_id,
+                brand_id=data.brand_id,
+                color_id=data.color_id,
+                subtype_id=data.subtype_id,
+                original_weight_grams=data.original_weight_grams,
+                weight_grams=data.get('weight_grams', None),
+                opened=data.get('opened', False),
+                in_use=data.get('in_use', False),
+            )
+            if not result.get('result', False):
+                raise HTTPException(status_code=400, detail="Failed to add roll")
+            return result
+
+        # TODO api endpoints to make: get rolls-filtered
 
     def run(self, host=None, port=None):
         """Run the FastAPI application.
