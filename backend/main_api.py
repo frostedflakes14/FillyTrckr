@@ -20,7 +20,7 @@ class FillyAPI:
     Manages the FastAPI instance and database connection.
     """
 
-    def __init__(self, config=filly_trkr_config()):
+    def __init__(self, config=filly_trkr_config(), db_connection=None):
         """Initialize the FastAPI application."""
         self._config = config
 
@@ -60,8 +60,12 @@ class FillyAPI:
             allow_headers=["*"],
         )
 
+        logger.info("Initializing API...")
         # Register routes
         self._register_routes()
+
+        if db_connection is not None:
+            self.connect_to_db(db_connection)
 
     def connect_to_db(self, db_connection):
         """Connect the API to a database instance.
@@ -411,6 +415,7 @@ class FillyAPI:
             host = self._config.api_info.host
         if port is None:
             port = self._config.api_info.port
+        logger.info(f"Starting API server on http://{host}:{port}")
         uvicorn.run(self.app, host=host, port=port)
 
 

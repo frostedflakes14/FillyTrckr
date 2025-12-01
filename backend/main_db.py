@@ -57,6 +57,7 @@ class db_connect:
         self.SessionLocal = None
         self._config = config
         self.db_connected = False
+        logger.info("Initializing database...")
         self._initialize_database()
 
     def _initialize_database(self):
