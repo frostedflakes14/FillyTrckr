@@ -205,7 +205,6 @@ class db_connect:
             return [roll.to_dict() for roll in rolls]
 
     def get_filly_rolls_active_filter(self,
-                                      # TODO the inputs should be cleaned by the api layer (ie strs should be all lowercase and stripped)
                                       type=None,
                                       type_id=None,
                                       brand=None,
@@ -300,23 +299,6 @@ class db_connect:
             return [s.to_dict() for s in subtypes]
 
     # Database insert methods
-
-    # TODO remove - this is a dummy function
-    def insert_dummy_filly_roll(self):
-        """Insert a dummy filly roll for testing purposes."""
-        with self.get_session() as session:
-            dummy_roll = db_filly_roll(
-                type_id=1,
-                brand_id=1,
-                color_id=1,
-                subtype_id=1,
-                weight_grams=500,
-                original_weight_grams=1000,
-                opened=True,
-                in_use=False
-            )
-            session.add(dummy_roll)
-            logger.info("Inserted dummy filly roll for testing.")
 
     def insert_roll(self,
                     type_id,

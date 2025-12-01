@@ -45,7 +45,7 @@ class FillyAPI:
         ]
 
         self.app = FastAPI(
-            title="Filly Trckr API",
+            title="FillyTrckr API",
             version="1.0.0",
             openapi_tags=tags_metadata
         )
@@ -261,7 +261,6 @@ class FillyAPI:
             if not all(item is not None for item in required_items):
                 raise HTTPException(status_code=400, detail="Missing required fields to add roll")
 
-            # TODO clean the inputs
             result = self.db.insert_roll(
                 type_id=data.type_id,
                 brand_id=data.brand_id,
@@ -352,7 +351,7 @@ class FillyAPI:
                     else:
                         raise HTTPException(status_code=400, detail="Invalid in_use value")
 
-            rolls = self.db.get_filly_rolls_active_filter( # TODO Clean the inputs
+            rolls = self.db.get_filly_rolls_active_filter(
                 type_id=filters["type_id"],
                 brand_id=filters["brand_id"],
                 color_id=filters["color_id"],

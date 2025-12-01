@@ -41,7 +41,7 @@ class request_roll_update_weight(BaseModel):
             }
         }
 
-class request_roll_add(BaseModel): # TODO finish updating this
+class request_roll_add(BaseModel):
     type_id: int
     brand_id: int
     color_id: int
