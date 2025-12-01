@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
+import BrandsPage from './pages/BrandsPage'
 
 /**
  * Main App Component
@@ -19,6 +20,7 @@ function App() {
         {/* index means this is the default route at "/" */}
         <Route index element={<HomePage />} />
         <Route path="about" element={<AboutPage />} />
+        <Route path="brands" element={<BrandsPage />} />
         {/* Add more routes here as you build features */}
       </Route>
     </Routes>
