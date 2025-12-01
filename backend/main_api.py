@@ -83,6 +83,19 @@ class FillyAPI:
         # async def get_version():
         #     return {"version": "1.0.0"}
 
+        # Add health check endpoint
+        @self.app.get(
+                "/api/health",
+                summary="Health check",
+                description="Check the health status of the API.",
+                tags=["Health Check"],
+                )
+        async def health_check():
+            if not self.db:
+                return {"status": "unhealthy", "detail": "Database not connected"}
+            else:
+                return {"status": "healthy"}
+
         @self.app.get(
                 "/api/v1/filly/brands",
                 response_model=api_models.response_get_brands,
