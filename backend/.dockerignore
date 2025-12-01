@@ -1,0 +1,30 @@
+# Exclude test directories
+test/
+*/test/
+**/test/
+
+# Exclude Python cache
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Exclude config.json from common
+../common/config.json
+
+# Exclude git files
+.git/
+.gitignore
+
+# Exclude IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Exclude OS files
+.DS_Store
+Thumbs.db
