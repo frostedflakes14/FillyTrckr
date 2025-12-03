@@ -63,7 +63,15 @@ function Layout() {
       </Container>
 
       {/* Footer */}
-      <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto', backgroundColor: '#f5f5f5' }}>
+      <Box
+        component="footer"
+        sx={{
+          py: 3,
+          px: 2,
+          mt: 'auto',
+          backgroundColor: 'footer.main'
+        }}
+      >
         <Container>
           <Typography variant="body2" color="text.secondary" align="center">
             © 2025 Filly Trckr
