@@ -1,5 +1,8 @@
-import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/material'
+import { AppBar, Toolbar, Typography, Button, Container, Box, IconButton } from '@mui/material'
 import { Link, Outlet } from 'react-router-dom'
+import Brightness4Icon from '@mui/icons-material/Brightness4'
+import Brightness7Icon from '@mui/icons-material/Brightness7'
+import { useThemeMode } from '../contexts/ThemeContext'
 
 /**
  * Layout Component
@@ -7,12 +10,15 @@ import { Link, Outlet } from 'react-router-dom'
  * This component wraps all pages and provides:
  * - A top navigation bar (AppBar)
  * - Navigation links
+ * - Dark mode toggle button
  * - A container for page content
  *
  * The <Outlet /> component is where the current page's content is rendered.
  * Think of it like a placeholder that shows different pages based on the URL.
  */
 function Layout() {
+  const { mode, toggleTheme } = useThemeMode()
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* AppBar is MUI's navigation bar component */}
@@ -42,6 +48,11 @@ function Layout() {
           <Button color="inherit" component={Link} to="/about">
             About
           </Button>
+
+          {/* Dark mode toggle button */}
+          <IconButton onClick={toggleTheme} color="inherit" sx={{ ml: 1 }}>
+            {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
         </Toolbar>
       </AppBar>
 
