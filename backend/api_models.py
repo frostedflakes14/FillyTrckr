@@ -249,3 +249,99 @@ class response_roll_update(BaseModel):
                 }
             }
         }
+
+class request_color_add(BaseModel):
+    name: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "green"
+            }
+        }
+
+class response_color_add(BaseModel):
+    id: int
+    name: str
+    created_at: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 3,
+                "name": "green",
+                "created_at": "2024-01-03T12:00:00Z"
+            }
+        }
+
+class request_subtype_add(BaseModel):
+    name: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "matte"
+            }
+        }
+
+class response_subtype_add(BaseModel):
+    id: int
+    name: str
+    created_at: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 3,
+                "name": "matte",
+                "created_at": "2024-01-03T12:00:00Z"
+            }
+        }
+
+class request_type_add(BaseModel):
+    name: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "petg"
+            }
+        }
+
+class response_type_add(BaseModel):
+    id: int
+    name: str
+    created_at: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 3,
+                "name": "petg",
+                "created_at": "2024-01-03T12:00:00Z"
+            }
+        }
+
+class request_brand_add(BaseModel):
+    name: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "creality"
+            }
+        }
+
+class response_brand_add(BaseModel):
+    id: int
+    name: str
+    created_at: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 3,
+                "name": "creality",
+                "created_at": "2024-01-03T12:00:00Z"
+            }
+        }

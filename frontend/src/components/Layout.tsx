@@ -30,6 +30,15 @@ function Layout() {
           <Button color="inherit" component={Link} to="/brands">
             Brands
           </Button>
+          <Button color="inherit" component={Link} to="/types">
+            Types
+          </Button>
+          <Button color="inherit" component={Link} to="/subtypes">
+            Subtypes
+          </Button>
+          <Button color="inherit" component={Link} to="/colors">
+            Colors
+          </Button>
           <Button color="inherit" component={Link} to="/about">
             About
           </Button>

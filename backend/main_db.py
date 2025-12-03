@@ -449,6 +449,110 @@ class db_connect:
             logger.info(f"Updated weight of filly roll to {roll.weight_grams}: {roll.descriptive_name}")
         return roll_data
 
+    def insert_filly_color(self, color_name):
+        """Insert a new filly color into the database.
+
+        Args:
+            color_name (str): Name of the filly color to insert.
+
+        Returns:
+            dict: Result of the insertion with 'result' key indicating success.
+        """
+        result = {'result': False, 'color': None}
+        with self.get_session() as session:
+            existing_color = session.query(db_filly_colors).filter_by(name=color_name).first()
+            if existing_color:
+                logger.info(f"Filly color '{color_name}' already exists. No insertion made.")
+                result['result'] = True
+                result['color'] = existing_color.to_dict()
+                return result
+
+            new_color = db_filly_colors(name=color_name)
+            session.add(new_color)
+            session.flush()  # This assigns the ID and makes relationships accessible
+            logger.info(f"Successfully inserted new filly color: {new_color.descriptive_name}")
+            result['result'] = True
+            result['color'] = new_color.to_dict()
+        return result
+
+    def insert_filly_brand(self, brand_name):
+        """Insert a new filly brand into the database.
+
+        Args:
+            brand_name (str): Name of the filly brand to insert.
+
+        Returns:
+            dict: Result of the insertion with 'result' key indicating success.
+        """
+        result = {'result': False, 'brand': None}
+        with self.get_session() as session:
+            existing_brand = session.query(db_filly_brands).filter_by(name=brand_name).first()
+            if existing_brand:
+                logger.info(f"Filly brand '{brand_name}' already exists. No insertion made.")
+                result['result'] = True
+                result['brand'] = existing_brand.to_dict()
+                return result
+
+            new_brand = db_filly_brands(name=brand_name)
+            session.add(new_brand)
+            session.flush()  # This assigns the ID and makes relationships accessible
+            logger.info(f"Successfully inserted new filly brand: {new_brand.descriptive_name}")
+            result['result'] = True
+            result['brand'] = new_brand.to_dict()
+        return result
+
+    def insert_filly_type(self, type_name):
+        """Insert a new filly type into the database.
+
+        Args:
+            type_name (str): Name of the filly type to insert.
+
+        Returns:
+            dict: Result of the insertion with 'result' key indicating success.
+        """
+        result = {'result': False, 'type': None}
+        with self.get_session() as session:
+            existing_type = session.query(db_filly_types).filter_by(name=type_name).first()
+            if existing_type:
+                logger.info(f"Filly type '{type_name}' already exists. No insertion made.")
+                result['result'] = True
+                result['type'] = existing_type.to_dict()
+                return result
+
+            new_type = db_filly_types(name=type_name)
+            session.add(new_type)
+            session.flush()  # This assigns the ID and makes relationships accessible
+            logger.info(f"Successfully inserted new filly type: {new_type.descriptive_name}")
+            result['result'] = True
+            result['type'] = new_type.to_dict()
+        return result
+
+    def insert_filly_subtype(self, subtype_name):
+        """Insert a new filly subtype into the database.
+
+        Args:
+            subtype_name (str): Name of the filly subtype to insert.
+
+        Returns:
+            dict: Result of the insertion with 'result' key indicating success.
+        """
+        result = {'result': False, 'subtype': None}
+        with self.get_session() as session:
+            existing_subtype = session.query(db_filly_subtypes).filter_by(name=subtype_name).first()
+            if existing_subtype:
+                logger.info(f"Filly subtype '{subtype_name}' already exists. No insertion made.")
+                result['result'] = True
+                result['subtype'] = existing_subtype.to_dict()
+                return result
+
+            new_subtype = db_filly_subtypes(name=subtype_name)
+            session.add(new_subtype)
+            session.flush()  # This assigns the ID and makes relationships accessible
+            logger.info(f"Successfully inserted new filly subtype: {new_subtype.descriptive_name}")
+            result['result'] = True
+            result['subtype'] = new_subtype.to_dict()
+        return result
+
 def main():
     """Main function to test database connection and configuration."""
     print("=" * 60)

@@ -3,6 +3,9 @@ import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import BrandsPage from './pages/BrandsPage'
+import TypesPage from './pages/TypesPage'
+import SubtypesPage from './pages/SubtypesPage'
+import ColorsPage from './pages/ColorsPage'
 
 /**
  * Main App Component
@@ -21,6 +24,9 @@ function App() {
         <Route index element={<HomePage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="brands" element={<BrandsPage />} />
+        <Route path="types" element={<TypesPage />} />
+        <Route path="subtypes" element={<SubtypesPage />} />
+        <Route path="colors" element={<ColorsPage />} />
         {/* Add more routes here as you build features */}
       </Route>
     </Routes>

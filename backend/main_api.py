@@ -190,6 +190,82 @@ class FillyAPI:
         # POST endpoints to update roll status
 
         @self.app.post(
+                "/api/v1/filly/colors/add",
+                response_model=api_models.response_color_add,
+                summary="Add a new filly color",
+                description="Add a new filament color to the database.",
+                tags=["Get Roll Properties"],
+                )
+        async def add_color(data: api_models.request_color_add):
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+
+            if not data.name or not data.name.strip():
+                raise HTTPException(status_code=400, detail="Color name cannot be empty")
+
+            result = self.db.insert_filly_color(color_name=data.name.strip().lower())
+            if not result.get('result', False):
+                raise HTTPException(status_code=400, detail="Failed to add color")
+            return result['color']
+
+        @self.app.post(
+                "/api/v1/filly/types/add",
+                response_model=api_models.response_type_add,
+                summary="Add a new filly type",
+                description="Add a new filament type to the database.",
+                tags=["Get Roll Properties"],
+                )
+        async def add_type(data: api_models.request_type_add):
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+
+            if not data.name or not data.name.strip():
+                raise HTTPException(status_code=400, detail="Type name cannot be empty")
+
+            result = self.db.insert_filly_type(type_name=data.name.strip().lower())
+            if not result.get('result', False):
+                raise HTTPException(status_code=400, detail="Failed to add type")
+            return result['type']
+
+        @self.app.post(
+                "/api/v1/filly/subtypes/add",
+                response_model=api_models.response_subtype_add,
+                summary="Add a new filly subtype",
+                description="Add a new filament subtype to the database.",
+                tags=["Get Roll Properties"],
+                )
+        async def add_subtype(data: api_models.request_subtype_add):
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+
+            if not data.name or not data.name.strip():
+                raise HTTPException(status_code=400, detail="Subtype name cannot be empty")
+
+            result = self.db.insert_filly_subtype(subtype_name=data.name.strip().lower())
+            if not result.get('result', False):
+                raise HTTPException(status_code=400, detail="Failed to add subtype")
+            return result['subtype']
+
+        @self.app.post(
+                "/api/v1/filly/brands/add",
+                response_model=api_models.response_brand_add,
+                summary="Add a new filly brand",
+                description="Add a new filament brand to the database.",
+                tags=["Get Roll Properties"],
+                )
+        async def add_brand(data: api_models.request_brand_add):
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+
+            if not data.name or not data.name.strip():
+                raise HTTPException(status_code=400, detail="Brand name cannot be empty")
+
+            result = self.db.insert_filly_brand(brand_name=data.name.strip().lower())
+            if not result.get('result', False):
+                raise HTTPException(status_code=400, detail="Failed to add brand")
+            return result['brand']
+
+        @self.app.post(
                 "/api/v1/filly/rolls/{roll_id}/set_in_use",
                 response_model=api_models.response_roll_update,
                 summary="Set roll in-use status",
