@@ -1,8 +1,9 @@
-import { AppBar, Toolbar, Typography, Button, Container, Box, IconButton } from '@mui/material'
+import { AppBar, Toolbar, Typography, Button, Container, Box, IconButton, Tooltip } from '@mui/material'
 import { Link, Outlet } from 'react-router-dom'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import { useThemeMode } from '../contexts/ThemeContext'
+import ApiStatus from './ApiStatus'
 
 /**
  * Layout Component
@@ -49,10 +50,15 @@ function Layout() {
             About
           </Button>
 
+          {/* API status indicator */}
+          <ApiStatus />
+
           {/* Dark mode toggle button */}
-          <IconButton onClick={toggleTheme} color="inherit" sx={{ ml: 1 }}>
-            {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-          </IconButton>
+          <Tooltip title={mode === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'} arrow>
+            <IconButton onClick={toggleTheme} color="inherit" sx={{ ml: 1 }}>
+              {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
 

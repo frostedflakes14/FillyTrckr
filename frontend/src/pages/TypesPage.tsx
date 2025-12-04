@@ -63,18 +63,19 @@ function TypesPage() {
         </Alert>
       )}
 
-      <Box sx={{ height: 600, width: '100%' }}>
+      <Box sx={{ height: 'calc(100vh - 300px)', minHeight: 400, width: '100%' }}>
         <DataGrid
           rows={types}
           columns={columns}
           loading={loading}
           initialState={{
             pagination: {
-              paginationModel: { pageSize: 10 },
+              paginationModel: { pageSize: 25 },
             },
           }}
-          pageSizeOptions={[5, 10, 25, 50]}
+          pageSizeOptions={[10, 25, 50, 100]}
           disableRowSelectionOnClick
+          autoPageSize
         />
       </Box>
     </Box>
