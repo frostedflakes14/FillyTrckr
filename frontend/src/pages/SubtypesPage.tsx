@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Typography, Box, Alert } from '@mui/material'
+import { Typography, Box, Alert, Button, Snackbar, AlertColor } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import axios from 'axios'
+import { api } from '../utils/api'
+import AddItemDialog from '../components/AddItemDialog'
 
 interface Subtype {
   id: number
@@ -14,21 +15,32 @@ function SubtypesPage() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchSubtypes = async () => {
-      try {
-        const response = await axios.get('/api/v1/filly/subtypes')
-        setSubtypes(response.data.subtypes)
-        setError(null)
-      } catch (err) {
-        setError('Failed to fetch subtypes. Make sure your backend is running.')
-        console.error('API Error:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
+  // Dialog state
+  const [addOpen, setAddOpen] = useState(false)
 
+  // Snackbar state
+  const [snackOpen, setSnackOpen] = useState(false)
+  const [snackMsg, setSnackMsg] = useState('')
+  const [snackSeverity, setSnackSeverity] = useState<AlertColor>('success')
+  const [snackAutoHideDuration, setSnackAutoHideDuration] = useState<number | null>(4000)
+
+  const fetchSubtypes = async () => {
+    setLoading(true)
+    try {
+      const response = await api.get('/v1/filly/subtypes')
+      setSubtypes(response.data.subtypes)
+      setError(null)
+    } catch (err) {
+      setError('Failed to fetch subtypes. Make sure your backend is running.')
+      console.error('API Error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchSubtypes()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Define columns for DataGrid
@@ -52,11 +64,16 @@ function SubtypesPage() {
 
   return (
     <Box>
-      <Typography variant="h3" component="h1" gutterBottom>
-        Filament Subtypes
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography variant="h3" component="h1" sx={{ mr: 2 }}>
+          Filament Subtypes
+        </Typography>
+        <Button variant="contained" onClick={() => setAddOpen(true)}>
+          Add Subtype
+        </Button>
+      </Box>
 
-      <Typography variant="body1" paragraph>
+      <Typography variant="body1" paragraph sx={{ mb: 2 }}>
         View all filament subtypes in the database.
       </Typography>
 
@@ -81,6 +98,45 @@ function SubtypesPage() {
           autoPageSize
         />
       </Box>
+
+      <AddItemDialog
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        apiEndpoint={'/v1/filly/subtypes/add'}
+        itemType={'subtype'}
+        showColorPicker={false}
+        onSuccess={(data: any) => {
+          if (data && data.error) {
+            setSnackMsg(typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail))
+            setSnackSeverity('error')
+            setSnackOpen(true)
+          } else if (data) {
+            const newId = data.id ?? (data.result && data.result.id)
+            const newName = data.name ?? ''
+            setSnackMsg(`Subtype ${newName || ''} successfully added to the database. New ID: ${newId ?? 'unknown'}`)
+            setSnackSeverity('success')
+            setSnackOpen(true)
+            fetchSubtypes()
+          }
+        }}
+      />
+
+      <Snackbar
+        open={snackOpen}
+        autoHideDuration={snackAutoHideDuration ?? undefined}
+        onClose={() => setSnackOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onMouseEnter={() => setSnackAutoHideDuration(null)}
+          onMouseLeave={() => setSnackAutoHideDuration(4000)}
+          onClose={() => setSnackOpen(false)}
+          severity={snackSeverity}
+          sx={{ width: '100%' }}
+        >
+          {snackMsg}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

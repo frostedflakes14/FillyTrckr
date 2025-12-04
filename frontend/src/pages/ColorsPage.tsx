@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Typography, Box, Alert } from '@mui/material'
+import { Typography, Box, Alert, Button, Snackbar, AlertColor } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import axios from 'axios'
+import { api } from '../utils/api'
+import AddItemDialog from '../components/AddItemDialog'
 
 interface Color {
   id: number
@@ -14,21 +15,34 @@ function ColorsPage() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchColors = async () => {
-      try {
-        const response = await axios.get('/api/v1/filly/colors')
-        setColors(response.data.colors)
-        setError(null)
-      } catch (err) {
-        setError('Failed to fetch colors. Make sure your backend is running.')
-        console.error('API Error:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
+  // Dialog state
+  const [addOpen, setAddOpen] = useState(false)
 
+  // Snackbar state
+  const [snackOpen, setSnackOpen] = useState(false)
+  const [snackMsg, setSnackMsg] = useState('')
+  const [snackSeverity, setSnackSeverity] = useState<AlertColor>('success')
+  const [snackAutoHideDuration, setSnackAutoHideDuration] = useState<number | null>(4000)
+
+  const fetchColors = async () => {
+    setLoading(true)
+    try {
+      // `api` has baseURL '/api' so endpoints passed to it should be relative to that base.
+      // Use '/v1/filly/colors' instead of '/api/v1/filly/colors' to avoid doubling /api in the request URL.
+      const response = await api.get('/v1/filly/colors')
+      setColors(response.data.colors)
+      setError(null)
+    } catch (err) {
+      setError('Failed to fetch colors. Make sure your backend is running.')
+      console.error('API Error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchColors()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Define columns for DataGrid
@@ -52,11 +66,17 @@ function ColorsPage() {
 
   return (
     <Box>
-      <Typography variant="h3" component="h1" gutterBottom>
-        Filament Colors
-      </Typography>
+      {/* Title and Add button on same line */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography variant="h3" component="h1" sx={{ mr: 2 }}>
+          Filament Colors
+        </Typography>
+        <Button variant="contained" onClick={() => setAddOpen(true)}>
+          Add Color
+        </Button>
+      </Box>
 
-      <Typography variant="body1" paragraph>
+      <Typography variant="body1" paragraph sx={{ mb: 2 }}>
         View all filament colors in the database.
       </Typography>
 
@@ -81,6 +101,50 @@ function ColorsPage() {
           autoPageSize
         />
       </Box>
+
+      {/* Add item dialog */}
+      <AddItemDialog
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+    // pass endpoint relative to api.baseURL ('/api')
+    apiEndpoint={'/v1/filly/colors/add'}
+        itemType={'color'}
+        onSuccess={(data: any) => {
+          // data may be success or error object depending on AddItemDialog
+          if (data && data.error) {
+            setSnackMsg(typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail))
+            setSnackSeverity('error')
+            setSnackOpen(true)
+          } else if (data) {
+            // Assuming backend returns { id: <newId>, name: <name> }
+            const newId = data.id ?? (data.result && data.result.id)
+            const newName = data.name ?? ''
+            setSnackMsg(`Color ${newName || ''} successfully added to the database. New ID: ${newId ?? 'unknown'}`)
+            setSnackSeverity('success')
+            setSnackOpen(true)
+            // Refresh table to include the new color
+            fetchColors()
+          }
+        }}
+      />
+
+      {/* Snackbar for feedback */}
+      <Snackbar
+        open={snackOpen}
+        autoHideDuration={snackAutoHideDuration ?? undefined}
+        onClose={() => setSnackOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onMouseEnter={() => setSnackAutoHideDuration(null)}
+          onMouseLeave={() => setSnackAutoHideDuration(4000)}
+          onClose={() => setSnackOpen(false)}
+          severity={snackSeverity}
+          sx={{ width: '100%' }}
+        >
+          {snackMsg}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }
