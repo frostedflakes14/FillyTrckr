@@ -27,7 +27,7 @@ function Layout() {
         <Toolbar>
           {/* Typography is MUI's text component */}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Filly Trckr
+            FillyTrckr
           </Typography>
 
           {/* Navigation buttons */}
@@ -80,7 +80,7 @@ function Layout() {
       >
         <Container>
           <Typography variant="body2" color="text.secondary" align="center">
-            © 2025 Filly Trckr
+            © 2025 FillyTrckr
           </Typography>
         </Container>
       </Box>

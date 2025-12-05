@@ -10,7 +10,7 @@ function AboutPage() {
   return (
     <Box>
       <Typography variant="h3" component="h1" gutterBottom>
-        About Filly Trckr
+        About FillyTrckr
       </Typography>
 
       <Paper elevation={3} sx={{ p: 3, mt: 3 }}>

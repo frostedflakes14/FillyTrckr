@@ -39,7 +39,7 @@ class FillyAPI:
                 "description": "Modify existing roll properties such as weight, status, and usage.",
             },
             {
-                "name": "Get Roll Properties",
+                "name": "Roll Properties",
                 "description": "Retrieve available brands, types, colors, and subtypes for filament rolls.",
             },
         ]
@@ -101,7 +101,7 @@ class FillyAPI:
                 response_model=api_models.response_get_brands,
                 summary="Get all filly brands",
                 description="Retrieve a list of all filament brands in the database.",
-                tags=["Get Roll Properties"],
+                tags=["Roll Properties"],
                 )
         async def get_brands():
             if not self.db:
@@ -114,7 +114,7 @@ class FillyAPI:
                 response_model=api_models.response_get_types,
                 summary="Get all filly types",
                 description="Retrieve a list of all filament types in the database.",
-                tags=["Get Roll Properties"],
+                tags=["Roll Properties"],
                 )
         async def get_types():
             if not self.db:
@@ -127,7 +127,7 @@ class FillyAPI:
                 response_model=api_models.response_get_colors,
                 summary="Get all filly colors",
                 description="Retrieve a list of all filament colors in the database.",
-                tags=["Get Roll Properties"],
+                tags=["Roll Properties"],
                 )
         async def get_colors():
             if not self.db:
@@ -140,7 +140,7 @@ class FillyAPI:
                 response_model=api_models.response_get_subtypes,
                 summary="Get all filly subtypes",
                 description="Retrieve a list of all filament subtypes in the database.",
-                tags=["Get Roll Properties"],
+                tags=["Roll Properties"],
                 )
         async def get_subtypes():
             if not self.db:
@@ -194,7 +194,7 @@ class FillyAPI:
                 response_model=api_models.response_color_add,
                 summary="Add a new filly color",
                 description="Add a new filament color to the database.",
-                tags=["Get Roll Properties"],
+                tags=["Roll Properties"],
                 )
         async def add_color(data: api_models.request_color_add):
             if not self.db:
@@ -213,7 +213,7 @@ class FillyAPI:
                 response_model=api_models.response_type_add,
                 summary="Add a new filly type",
                 description="Add a new filament type to the database.",
-                tags=["Get Roll Properties"],
+                tags=["Roll Properties"],
                 )
         async def add_type(data: api_models.request_type_add):
             if not self.db:
@@ -232,7 +232,7 @@ class FillyAPI:
                 response_model=api_models.response_subtype_add,
                 summary="Add a new filly subtype",
                 description="Add a new filament subtype to the database.",
-                tags=["Get Roll Properties"],
+                tags=["Roll Properties"],
                 )
         async def add_subtype(data: api_models.request_subtype_add):
             if not self.db:
@@ -251,7 +251,7 @@ class FillyAPI:
                 response_model=api_models.response_brand_add,
                 summary="Add a new filly brand",
                 description="Add a new filament brand to the database.",
-                tags=["Get Roll Properties"],
+                tags=["Roll Properties"],
                 )
         async def add_brand(data: api_models.request_brand_add):
             if not self.db:

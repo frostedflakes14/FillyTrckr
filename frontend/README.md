@@ -1,4 +1,4 @@
-# Filly Trckr Frontend
+# FillyTrckr Frontend
 
 React + TypeScript frontend application with Material-UI.
 
