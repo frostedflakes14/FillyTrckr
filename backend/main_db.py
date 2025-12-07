@@ -142,9 +142,9 @@ class db_connect:
                     added_count += 1
 
             # Populate filly_colors
-            for color_name in filly_colors_defaults:
-                if color_name not in existing_colors:
-                    session.add(db_filly_colors(name=color_name))
+            for color_obj in filly_colors_defaults:
+                if color_obj['name'] not in existing_colors:
+                    session.add(db_filly_colors(name=color_obj['name'], hex_code=color_obj['hex_code']))
                     added_count += 1
 
             # Populate filly_subtypes
@@ -211,6 +211,7 @@ class db_connect:
                                       brand=None,
                                       brand_id=None,
                                       color=None,
+                                      color_hex_code=None,
                                       color_id=None,
                                       subtype=None,
                                       subtype_id=None,
@@ -225,13 +226,14 @@ class db_connect:
             brand (str, optional): Filament brand name to filter by.
             brand_id (int, optional): Filament brand ID to filter by.
             color (str, optional): Filament color name to filter by.
+            color_hex_code (str, optional): Filament color hex code to filter by.
             color_id (int, optional): Filament color ID to filter by.
             subtype (str, optional): Filament subtype name to filter by.
             subtype_id (int, optional): Filament subtype ID to filter by.
             opened (bool, optional): Filter by opened status.
             in_use (bool, optional): Filter by in use status.
         """
-        logger.info(f'Getting active filly rolls with filters: type={type}, type_id={type_id}, brand={brand}, brand_id={brand_id}, color={color}, color_id={color_id}, subtype={subtype}, subtype_id={subtype_id}, opened={opened}, in_use={in_use}')
+        logger.info(f'Getting active filly rolls with filters: type={type}, type_id={type_id}, brand={brand}, brand_id={brand_id}, color={color}, color_hex_code={color_hex_code}, color_id={color_id}, subtype={subtype}, subtype_id={subtype_id}, opened={opened}, in_use={in_use}')
         with self.get_session() as session:
             query = session.query(db_filly_roll).filter(db_filly_roll.weight_grams > 0)
 
@@ -245,6 +247,8 @@ class db_connect:
                 query = query.filter(db_filly_roll.brand_id == brand_id)
             if color:
                 query = query.join(db_filly_colors).filter(db_filly_colors.name == color)
+            if color_hex_code:
+                query = query.join(db_filly_colors).filter(db_filly_colors.hex_code == color_hex_code)
             if color_id:
                 query = query.filter(db_filly_roll.color_id == color_id)
             if subtype:
@@ -449,28 +453,28 @@ class db_connect:
             logger.info(f"Updated weight of filly roll to {roll.weight_grams}: {roll.descriptive_name}")
         return roll_data
 
-    def insert_filly_color(self, color_name):
+    def insert_filly_color(self, color_name, hex_code):
         """Insert a new filly color into the database.
 
         Args:
             color_name (str): Name of the filly color to insert.
-
+            hex_code (str): Hex code of the filly color to insert.
         Returns:
             dict: Result of the insertion with 'result' key indicating success.
         """
         result = {'result': False, 'color': None}
         with self.get_session() as session:
-            existing_color = session.query(db_filly_colors).filter_by(name=color_name).first()
+            existing_color = session.query(db_filly_colors).filter_by(name=color_name, hex_code=hex_code).first()
             if existing_color:
                 logger.info(f"Filly color '{color_name}' already exists. No insertion made.")
                 result['result'] = True
                 result['color'] = existing_color.to_dict()
                 return result
 
-            new_color = db_filly_colors(name=color_name)
+            new_color = db_filly_colors(name=color_name, hex_code=hex_code)
             session.add(new_color)
             session.flush()  # This assigns the ID and makes relationships accessible
-            logger.info(f"Successfully inserted new filly color: {new_color.descriptive_name}")
+            logger.info(f"Successfully inserted new filly color: {new_color.descriptive_name}, Hex: {new_color.hex_code}")
             result['result'] = True
             result['color'] = new_color.to_dict()
         return result

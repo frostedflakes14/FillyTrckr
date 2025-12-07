@@ -85,7 +85,7 @@ class db_filly_colors(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    # TODO maybe add hex code column later
+    hex_code = Column(String(7), nullable=False)  # Format: #RRGGBB
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     @property
@@ -94,7 +94,7 @@ class db_filly_colors(Base):
 
     @property
     def descriptive_name(self):
-        return f"{self.name_formatted} (ID: {self.id})"
+        return f"{self.name_formatted} (ID: {self.id}) - Hex: {self.hex_code}"
 
     def __repr__(self):
         return f"<Class {self.__class__.__name__}> {self.descriptive_name}"
@@ -108,6 +108,7 @@ class db_filly_colors(Base):
         return {
             'id': self.id,
             'name': self.name,
+            'hex_code': self.hex_code,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
 
@@ -182,6 +183,7 @@ class db_filly_roll(Base):
             'brand': self.brand.name if self.brand else None,
             'brand_id': self.brand_id,
             'color': self.color.name if self.color else None,
+            'color_hex_code': self.color.hex_code if self.color else None,
             'color_id': self.color_id,
             'subtype': self.subtype.name if self.subtype else None,
             'subtype_id': self.subtype_id,

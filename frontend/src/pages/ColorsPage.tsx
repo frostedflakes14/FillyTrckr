@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Typography, Box, Alert, Button, Snackbar, AlertColor } from '@mui/material'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { Typography, Box, Alert, Button, Snackbar, AlertColor, Tooltip } from '@mui/material'
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { api } from '../utils/api'
 import AddItemDialog from '../components/AddItemDialog'
 
 interface Color {
   id: number
   name: string
+  hex_code: string
   created_at: string
 }
 
@@ -61,6 +62,49 @@ function ColorsPage() {
       }
     },
     { field: 'id', headerName: 'ID', width: 100 },
+    {
+      field: 'hex_code',
+      headerName: 'Color',
+      flex: 1,
+      minWidth: 70,
+      // center the color circle
+      // align: 'center',
+      // headerAlign: 'center',
+      renderCell: (params: GridRenderCellParams) => {
+        const hexCode = params.value as string
+        if (!hexCode) return null
+
+        return (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              // Centers it in the column
+              // justifyContent: 'center',
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            <Tooltip title={hexCode} placement="bottom">
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  backgroundColor: hexCode,
+                  border: '2px solid #ccc',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                  '&:hover': {
+                    transform: 'scale(1.2)',
+                  }
+                }}
+              />
+            </Tooltip>
+          </Box>
+        )
+      }
+    },
     { field: 'created_at', headerName: 'Created At', flex: 1, minWidth: 200 },
   ]
 

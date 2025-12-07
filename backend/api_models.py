@@ -127,11 +127,13 @@ class response_get_colors(BaseModel):
                     {
                         "id": 1,
                         "name": "red",
+                        "hex_code": "#FF0000",
                         "created_at": "2024-01-01T12:00:00Z"
                     },
                     {
                         "id": 2,
                         "name": "blue",
+                        "hex_code": "#0000FF",
                         "created_at": "2024-01-02T12:00:00Z"
                     }
                 ]
@@ -164,6 +166,7 @@ class response_roll_data(BaseModel):
     brand: str
     brand_id: int
     color: str
+    color_hex_code: str
     color_id: int
     subtype: str
     subtype_id: int
@@ -183,6 +186,7 @@ class response_roll_data(BaseModel):
                 "brand": "bambu",
                 "brand_id": 1,
                 "color": "blue",
+                "color_hex_code": "#0000FF",
                 "color_id": 1,
                 "subtype": "basic",
                 "subtype_id": 1,
@@ -208,6 +212,7 @@ class response_get_rolls(BaseModel):
                         "brand": "bambu",
                         "brand_id": 1,
                         "color": "blue",
+                        "color_hex_code": "#0000FF",
                         "color_id": 1,
                         "subtype": "basic",
                         "subtype_id": 1,
@@ -237,6 +242,7 @@ class response_roll_update(BaseModel):
                     "brand": "bambu",
                     "brand_id": 1,
                     "color": "blue",
+                    "color_hex_code": "#0000FF",
                     "color_id": 1,
                     "subtype": "basic",
                     "subtype_id": 1,
@@ -252,17 +258,20 @@ class response_roll_update(BaseModel):
 
 class request_color_add(BaseModel):
     name: str
+    hex_code: str
 
     class Config:
         json_schema_extra = {
             "example": {
-                "name": "green"
+                "name": "green",
+                "hex_code": "#00FF00"
             }
         }
 
 class response_color_add(BaseModel):
     id: int
     name: str
+    hex_code: str
     created_at: str
 
     class Config:
@@ -270,6 +279,7 @@ class response_color_add(BaseModel):
             "example": {
                 "id": 3,
                 "name": "green",
+                "hex_code": "#00FF00",
                 "created_at": "2024-01-03T12:00:00Z"
             }
         }
