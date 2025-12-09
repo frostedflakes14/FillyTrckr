@@ -53,8 +53,10 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ open, onClose, onSuccess,
     setLoading(true)
     try {
       const payload: any = { name: name.trim() }
-      // When backend supports hex values, include it like:
-      // payload.hex = color
+      // Include hex_code if color picker is shown
+      if (showColorPicker) {
+        payload.hex_code = color
+      }
 
       const resp = await api.post(apiEndpoint, payload)
       // resp.data is passed back to caller for message/display

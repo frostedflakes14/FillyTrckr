@@ -151,9 +151,10 @@ function ColorsPage() {
       <AddItemDialog
         open={addOpen}
         onClose={() => setAddOpen(false)}
-    // pass endpoint relative to api.baseURL ('/api')
-    apiEndpoint={'/v1/filly/colors/add'}
+        // pass endpoint relative to api.baseURL ('/api')
+        apiEndpoint={'/v1/filly/colors/add'}
         itemType={'color'}
+        showColorPicker={true}
         onSuccess={(data: any) => {
           // data may be success or error object depending on AddItemDialog
           if (data && data.error) {

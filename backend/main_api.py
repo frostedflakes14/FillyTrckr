@@ -206,7 +206,7 @@ class FillyAPI:
             if not data.hex_code or not data.hex_code.strip():
                 raise HTTPException(status_code=400, detail="Color hex code cannot be empty")
 
-            result = self.db.insert_filly_color(color_name=data.name.strip().lower(), color_hex_code=data.hex_code.strip().lower())
+            result = self.db.insert_filly_color(color_name=data.name.strip().lower(), hex_code=data.hex_code.strip())
             if not result.get('result', False):
                 raise HTTPException(status_code=400, detail="Failed to add color")
             return result['color']
