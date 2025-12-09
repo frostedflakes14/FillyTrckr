@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Typography, Box, Alert, Button, Snackbar, AlertColor, Tooltip } from '@mui/material'
+import { Typography, Box, Alert, Snackbar, AlertColor, Tooltip, Fab } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
+import AddIcon from '@mui/icons-material/Add'
 import { api } from '../utils/api'
 import AddItemDialog from '../components/AddItemDialog'
 import { createDateTimeColumn } from '../utils/dateColumn'
@@ -111,14 +112,11 @@ function ColorsPage() {
 
   return (
     <Box>
-      {/* Title and Add button on same line */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-        <Typography variant="h3" component="h1" sx={{ mr: 2 }}>
+      {/* Title */}
+      <Box sx={{ mb: 1 }}>
+        <Typography variant="h3" component="h1">
           Filament Colors
         </Typography>
-        <Button variant="contained" onClick={() => setAddOpen(true)}>
-          Add Color
-        </Button>
       </Box>
 
       <Typography variant="body1" paragraph sx={{ mb: 2 }}>
@@ -131,7 +129,7 @@ function ColorsPage() {
         </Alert>
       )}
 
-      <Box sx={{ height: 'calc(100vh - 300px)', minHeight: 400, width: '100%' }}>
+      <Box sx={{ height: 'calc(100vh - 300px)', minHeight: 400, width: '100%', position: 'relative' }}>
         <DataGrid
           rows={colors}
           columns={columns}
@@ -144,7 +142,28 @@ function ColorsPage() {
           pageSizeOptions={[10, 25, 50, 100]}
           disableRowSelectionOnClick
           autoPageSize
+          sx={{
+            '& .MuiDataGrid-main': {
+              position: 'relative',
+            },
+          }}
         />
+
+        {/* Floating Action Button inside data area */}
+        <Fab
+          color="primary"
+          aria-label="add color"
+          sx={{
+            position: 'absolute',
+            bottom: 72, // Position above footer (footer is typically ~56px)
+            right: 16,
+            pointerEvents: 'auto',
+            zIndex: 1,
+          }}
+          onClick={() => setAddOpen(true)}
+        >
+          <AddIcon />
+        </Fab>
       </Box>
 
       {/* Add item dialog */}
