@@ -3,6 +3,7 @@ import { Typography, Box, Alert, Button, Snackbar, AlertColor } from '@mui/mater
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { api } from '../utils/api'
 import AddItemDialog from '../components/AddItemDialog'
+import { createDateTimeColumn } from '../utils/dateColumn'
 
 interface Subtype {
   id: number
@@ -59,7 +60,7 @@ function SubtypesPage() {
       }
     },
     { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'created_at', headerName: 'Created At', flex: 1, minWidth: 200 },
+    createDateTimeColumn(),
   ]
 
   return (
