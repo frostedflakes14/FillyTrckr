@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Typography, Box, Alert, Snackbar, AlertColor, Tooltip, Button, Fab } from '@mui/material'
+import { Typography, Box, Alert, Snackbar, AlertColor, Tooltip, Button, Fab, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid'
 import AddIcon from '@mui/icons-material/Add'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
@@ -60,6 +60,9 @@ function RollsPage() {
 
   // Dialog state
   const [addOpen, setAddOpen] = useState(false)
+  const [weightDialogOpen, setWeightDialogOpen] = useState(false)
+  const [editingRoll, setEditingRoll] = useState<RollWithDetails | null>(null)
+  const [newWeight, setNewWeight] = useState<string>('')
 
   // Snackbar state
   const [snackOpen, setSnackOpen] = useState(false)
@@ -189,6 +192,53 @@ function RollsPage() {
     setSnackOpen(true)
   }
 
+  const handleWeightClick = (roll: RollWithDetails) => {
+    setEditingRoll(roll)
+    setNewWeight('')
+    setWeightDialogOpen(true)
+  }
+
+  const handleWeightDialogClose = () => {
+    setWeightDialogOpen(false)
+    setEditingRoll(null)
+    setNewWeight('')
+  }
+
+  const handleWeightUpdate = async () => {
+    if (!editingRoll) return
+
+    const weightValue = parseFloat(newWeight)
+    if (isNaN(weightValue) || weightValue < 0) {
+      setSnackMsg('Please enter a valid weight')
+      setSnackSeverity('error')
+      setSnackOpen(true)
+      return
+    }
+
+    try {
+      // If roll is not opened, mark it as opened first
+      if (!editingRoll.opened) {
+        await api.post(`/v1/filly/rolls/${editingRoll.id}/set_opened`)
+      }
+
+      // Update the weight
+      await api.post(`/v1/filly/rolls/${editingRoll.id}/update_weight`, {
+        new_weight_grams: weightValue
+      })
+
+      setSnackMsg('Weight updated successfully!')
+      setSnackSeverity('success')
+      setSnackOpen(true)
+      handleWeightDialogClose()
+      fetchRolls()
+    } catch (err) {
+      setSnackMsg('Failed to update weight')
+      setSnackSeverity('error')
+      setSnackOpen(true)
+      console.error('Update weight error:', err)
+    }
+  }
+
   // Define columns for DataGrid
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 80 },
@@ -271,7 +321,26 @@ function RollsPage() {
       minWidth: 130,
       renderCell: (params: GridRenderCellParams) => {
         const row = params.row as RollWithDetails
-        return `${row.weight_grams} / ${row.original_weight_grams}`
+        return (
+          <Box
+            onClick={() => handleWeightClick(row)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+              height: '100%',
+              cursor: 'pointer',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              transition: 'background-color 0.2s',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              },
+            }}
+          >
+            {`${row.weight_grams} / ${row.original_weight_grams}`}
+          </Box>
+        )
       }
     },
     {
@@ -404,6 +473,49 @@ function RollsPage() {
         onClose={() => setAddOpen(false)}
         onSuccess={handleAddSuccess}
       />
+
+      {/* Weight Edit Dialog */}
+      <Dialog open={weightDialogOpen} onClose={handleWeightDialogClose} maxWidth="xs" fullWidth>
+        <DialogTitle>
+          Update Weight
+          {editingRoll && !editingRoll.opened && (
+            <Typography variant="caption" display="block" color="warning.main" sx={{ mt: 1 }}>
+              This roll will be marked as opened
+            </Typography>
+          )}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              autoFocus
+              label="New Weight (grams)"
+              type="number"
+              fullWidth
+              value={newWeight}
+              onChange={(e) => setNewWeight(e.target.value)}
+              inputProps={{ min: 0, step: 0.1 }}
+            />
+            {editingRoll && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Current Weight: {editingRoll.weight_grams}g
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Original Weight: {editingRoll.original_weight_grams}g
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleWeightDialogClose} color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={handleWeightUpdate} variant="contained">
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Snackbar for notifications */}
       <Snackbar
