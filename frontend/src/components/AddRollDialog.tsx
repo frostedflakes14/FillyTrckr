@@ -217,6 +217,23 @@ const AddRollDialog: React.FC<AddRollDialogProps> = ({ open, onClose, onSuccess 
           </Box>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+            <FormControl fullWidth error={errors.brandId}>
+              <InputLabel id="brand-select-label">Brand</InputLabel>
+              <Select
+                labelId="brand-select-label"
+                id="brand-select"
+                value={brandId}
+                label="Brand"
+                onChange={handleBrandChange}
+              >
+                {brands.map((brand) => (
+                  <MenuItem key={brand.id} value={brand.id}>
+                    {capitalizeWords(brand.name)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
             <FormControl fullWidth error={errors.typeId}>
               <InputLabel id="type-select-label">Type</InputLabel>
               <Select
@@ -234,18 +251,18 @@ const AddRollDialog: React.FC<AddRollDialogProps> = ({ open, onClose, onSuccess 
               </Select>
             </FormControl>
 
-            <FormControl fullWidth error={errors.brandId}>
-              <InputLabel id="brand-select-label">Brand</InputLabel>
+            <FormControl fullWidth error={errors.subtypeId}>
+              <InputLabel id="subtype-select-label">Subtype</InputLabel>
               <Select
-                labelId="brand-select-label"
-                id="brand-select"
-                value={brandId}
-                label="Brand"
-                onChange={handleBrandChange}
+                labelId="subtype-select-label"
+                id="subtype-select"
+                value={subtypeId}
+                label="Subtype"
+                onChange={handleSubtypeChange}
               >
-                {brands.map((brand) => (
-                  <MenuItem key={brand.id} value={brand.id}>
-                    {capitalizeWords(brand.name)}
+                {subtypes.map((subtype) => (
+                  <MenuItem key={subtype.id} value={subtype.id}>
+                    {capitalizeWords(subtype.name)}
                   </MenuItem>
                 ))}
               </Select>
@@ -274,23 +291,6 @@ const AddRollDialog: React.FC<AddRollDialogProps> = ({ open, onClose, onSuccess 
                       />
                       {capitalizeWords(color.name)}
                     </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth error={errors.subtypeId}>
-              <InputLabel id="subtype-select-label">Subtype</InputLabel>
-              <Select
-                labelId="subtype-select-label"
-                id="subtype-select"
-                value={subtypeId}
-                label="Subtype"
-                onChange={handleSubtypeChange}
-              >
-                {subtypes.map((subtype) => (
-                  <MenuItem key={subtype.id} value={subtype.id}>
-                    {capitalizeWords(subtype.name)}
                   </MenuItem>
                 ))}
               </Select>
