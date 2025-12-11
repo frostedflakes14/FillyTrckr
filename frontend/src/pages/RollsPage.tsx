@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import { Typography, Box, Alert, Snackbar, AlertColor, Tooltip, Button } from '@mui/material'
+import { Typography, Box, Alert, Snackbar, AlertColor, Tooltip, Button, Fab } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams, GridActionsCellItem } from '@mui/x-data-grid'
+import AddIcon from '@mui/icons-material/Add'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import ToggleOffIcon from '@mui/icons-material/ToggleOff'
 import { api } from '../utils/api'
 import { createDateTimeColumn } from '../utils/dateColumn'
+import AddRollDialog from '../components/AddRollDialog'
 
 interface Roll {
   id: number
@@ -55,6 +57,9 @@ function RollsPage() {
   const [rolls, setRolls] = useState<RollWithDetails[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Dialog state
+  const [addOpen, setAddOpen] = useState(false)
 
   // Snackbar state
   const [snackOpen, setSnackOpen] = useState(false)
@@ -170,6 +175,18 @@ function RollsPage() {
 
   const handleSnackClose = () => {
     setSnackOpen(false)
+  }
+
+  const handleAddSuccess = (data: any) => {
+    if (data.error) {
+      setSnackMsg('Failed to add roll: ' + (data.detail?.detail || data.detail || 'Unknown error'))
+      setSnackSeverity('error')
+    } else {
+      setSnackMsg('Roll added successfully!')
+      setSnackSeverity('success')
+      fetchRolls()
+    }
+    setSnackOpen(true)
   }
 
   // Define columns for DataGrid
@@ -363,7 +380,30 @@ function RollsPage() {
             },
           }}
         />
+
+        {/* Floating Action Button inside data area */}
+        <Fab
+          color="primary"
+          aria-label="add roll"
+          sx={{
+            position: 'absolute',
+            bottom: 72, // Position above footer (footer is typically ~56px)
+            right: 16,
+            pointerEvents: 'auto',
+            zIndex: 1,
+          }}
+          onClick={() => setAddOpen(true)}
+        >
+          <AddIcon />
+        </Fab>
       </Box>
+
+      {/* Add Roll Dialog */}
+      <AddRollDialog
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onSuccess={handleAddSuccess}
+      />
 
       {/* Snackbar for notifications */}
       <Snackbar
