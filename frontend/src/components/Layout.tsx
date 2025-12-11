@@ -46,6 +46,9 @@ function Layout() {
           <Button color="inherit" component={Link} to="/colors">
             Colors
           </Button>
+          <Button color="inherit" component={Link} to="/rolls">
+            Rolls
+          </Button>
           <Button color="inherit" component={Link} to="/about">
             About
           </Button>
