@@ -719,7 +719,7 @@ function RollsPage() {
                             }}
                             sx={{ minWidth: 'auto', px: 0.5, fontSize: '0.7rem' }}
                           >
-                            used all
+                            empty
                           </Button>
                         </Box>
                         <Button

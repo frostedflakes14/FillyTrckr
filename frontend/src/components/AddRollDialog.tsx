@@ -106,10 +106,24 @@ const AddRollDialog: React.FC<AddRollDialogProps> = ({ open, onClose, onSuccess 
         api.get('/v1/filly/subtypes')
       ])
 
-      setBrands(brandsRes.data.brands)
+      const brandsList = brandsRes.data.brands
+      const typesList = typesRes.data.types
+
+      setBrands(brandsList)
       setColors(colorsRes.data.colors)
-      setTypes(typesRes.data.types)
+      setTypes(typesList)
       setSubtypes(subtypesRes.data.subtypes)
+
+      // Set defaults: Bambu for brand, PLA for type
+      const bambuBrand = brandsList.find((b: Brand) => b.name.toLowerCase() === 'bambu')
+      if (bambuBrand) {
+        setBrandId(bambuBrand.id)
+      }
+
+      const plaType = typesList.find((t: Type) => t.name.toLowerCase() === 'pla')
+      if (plaType) {
+        setTypeId(plaType.id)
+      }
     } catch (err) {
       console.error('Failed to fetch lookup data:', err)
     } finally {
