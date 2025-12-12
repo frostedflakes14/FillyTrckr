@@ -30,7 +30,7 @@ function SubtypesPage() {
     setLoading(true)
     try {
       const response = await api.get('/v1/filly/subtypes')
-      setSubtypes(response.data.subtypes)
+      setSubtypes(response.data?.subtypes || [])
       setError(null)
     } catch (err) {
       setError('Failed to fetch subtypes. Make sure your backend is running.')

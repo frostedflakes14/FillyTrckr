@@ -33,7 +33,7 @@ function ColorsPage() {
       // `api` has baseURL '/api' so endpoints passed to it should be relative to that base.
       // Use '/v1/filly/colors' instead of '/api/v1/filly/colors' to avoid doubling /api in the request URL.
       const response = await api.get('/v1/filly/colors')
-      setColors(response.data.colors)
+      setColors(response.data?.colors || [])
       setError(null)
     } catch (err) {
       setError('Failed to fetch colors. Make sure your backend is running.')

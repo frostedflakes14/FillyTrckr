@@ -69,7 +69,7 @@ class filly_trkr_config:
 
         @property
         def host(self):
-            return self._d.get("host", 'localhost')
+            return self._d.get("host", '0.0.0.0')
 
         @property
         def port(self):

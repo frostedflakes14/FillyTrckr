@@ -110,10 +110,10 @@ function RollsPage() {
         api.get('/v1/filly/subtypes')
       ])
 
-      const brandsList = brandsRes.data.brands
-      const colorsList = colorsRes.data.colors
-      const typesList = typesRes.data.types
-      const subtypesList = subtypesRes.data.subtypes
+      const brandsList = brandsRes.data?.brands || []
+      const colorsList = colorsRes.data?.colors || []
+      const typesList = typesRes.data?.types || []
+      const subtypesList = subtypesRes.data?.subtypes || []
 
       // Set state for filter dropdowns
       setBrands(brandsList)
@@ -122,16 +122,24 @@ function RollsPage() {
       setSubtypes(subtypesList)
 
       const brandsMap = new Map<number, Brand>()
-      brandsList.forEach((b: Brand) => brandsMap.set(b.id, b))
+      if (Array.isArray(brandsList)) {
+        brandsList.forEach((b: Brand) => brandsMap.set(b.id, b))
+      }
 
       const colorsMap = new Map<number, Color>()
-      colorsList.forEach((c: Color) => colorsMap.set(c.id, c))
+      if (Array.isArray(colorsList)) {
+        colorsList.forEach((c: Color) => colorsMap.set(c.id, c))
+      }
 
       const typesMap = new Map<number, Type>()
-      typesList.forEach((t: Type) => typesMap.set(t.id, t))
+      if (Array.isArray(typesList)) {
+        typesList.forEach((t: Type) => typesMap.set(t.id, t))
+      }
 
       const subtypesMap = new Map<number, Subtype>()
-      subtypesList.forEach((s: Subtype) => subtypesMap.set(s.id, s))
+      if (Array.isArray(subtypesList)) {
+        subtypesList.forEach((s: Subtype) => subtypesMap.set(s.id, s))
+      }
 
       // Return the maps so they can be used immediately
       return { brandsMap, colorsMap, typesMap, subtypesMap }
@@ -156,7 +164,7 @@ function RollsPage() {
       if (filterInUseOnly) params.in_use = true
 
       const response = await api.get('/v1/filly/rolls/filter', { params })
-      const rollsData: Roll[] = response.data.rolls
+      const rollsData: Roll[] = response.data?.rolls || []
 
       // Enrich rolls with lookup data using the returned maps
       const enrichedRolls: RollWithDetails[] = rollsData.map((roll) => ({

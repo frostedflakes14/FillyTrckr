@@ -30,7 +30,7 @@ function TypesPage() {
     setLoading(true)
     try {
       const response = await api.get('/v1/filly/types')
-      setTypes(response.data.types)
+      setTypes(response.data?.types || [])
       setError(null)
     } catch (err) {
       setError('Failed to fetch types. Make sure your backend is running.')

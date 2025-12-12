@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   frontend:
-    build: ./frontend
+    image: "${MY_DOCKER_REG}/fillytrckr-frontend:latest"
     container_name: fillytrckr-frontend
     ports:
       - "3006:80"
@@ -13,7 +13,7 @@ services:
       - backend
 
   backend:
-    build: ./backend
+    image: "${MY_DOCKER_REG}/fillytrckr-backend:latest"
     container_name: fillytrckr-backend
     ports:
       - "3007:8000"
@@ -40,7 +40,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "5434:5432"
     networks:
       - fillytrckr_network
 

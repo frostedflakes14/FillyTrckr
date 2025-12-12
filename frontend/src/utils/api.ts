@@ -55,27 +55,3 @@ export const checkHealth = async () => {
   const response = await api.get('/health')
   return response.data
 }
-
-// Example: Get all items
-export const getItems = async () => {
-  const response = await api.get('/items')
-  return response.data
-}
-
-// Example: Create a new item
-export const createItem = async (itemData: any) => {
-  const response = await api.post('/items', itemData)
-  return response.data
-}
-
-// Example: Update an item
-export const updateItem = async (id: number, itemData: any) => {
-  const response = await api.put(`/items/${id}`, itemData)
-  return response.data
-}
-
-// Example: Delete an item
-export const deleteItem = async (id: number) => {
-  const response = await api.delete(`/items/${id}`)
-  return response.data
-}

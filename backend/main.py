@@ -6,6 +6,7 @@ then starts the API server.
 
 import sys
 from pathlib import Path
+import time
 
 # Add common directory to path for imports
 common_path = Path(__file__).parent.parent / "common"
@@ -20,6 +21,8 @@ logger = get_logger(__name__)
 
 def main():
     """Initialize and run the Filly Tracker application."""
+    # delay 10 seconds
+    time.sleep(10)
     logger.info("Starting Filly Tracker application...")
 
     config = filly_trkr_config()

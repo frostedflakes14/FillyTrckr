@@ -26,9 +26,11 @@ export function createDateTimeColumn(
     minWidth,
     type: 'dateTime',
     valueGetter: (value: string) => {
-      // Backend returns datetime without timezone info, but it's actually UTC
-      // Append 'Z' to treat it as UTC, then JS Date will convert to local timezone
-      return value ? new Date(value + 'Z') : null
+      if (!value) return null
+      // Check if the timestamp already has timezone info (ends with 'Z' or has '+'/'-' offset)
+      const hasTimezone = value.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(value)
+      // If no timezone info, append 'Z' to treat it as UTC
+      return new Date(hasTimezone ? value : value + 'Z')
     },
     renderCell: (params: GridRenderCellParams) => {
       const date = params.value as Date

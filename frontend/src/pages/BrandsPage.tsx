@@ -30,7 +30,7 @@ function BrandsPage() {
     setLoading(true)
     try {
       const response = await api.get('/v1/filly/brands')
-      setBrands(response.data.brands)
+      setBrands(response.data?.brands || [])
       setError(null)
     } catch (err) {
       setError('Failed to fetch brands. Make sure your backend is running.')

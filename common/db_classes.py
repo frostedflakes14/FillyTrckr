@@ -85,7 +85,7 @@ class db_filly_colors(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    hex_code = Column(String(7), nullable=False)  # Format: #RRGGBB
+    hex_code = Column(String(9), nullable=False)  # Format: #RRGGBB or #RRGGBBAA
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     @property
