@@ -1,11 +1,12 @@
 version: '3.8'
 
 services:
+
   frontend:
     build: ./frontend
     container_name: fillytrckr-frontend
     ports:
-      - "80:80"
+      - "3006:80"
     networks:
       - fillytrckr_network
     depends_on:
@@ -15,9 +16,15 @@ services:
     build: ./backend
     container_name: fillytrckr-backend
     ports:
-      - "8000:8000"
+      - "3007:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/fillytrckr
+      - DB_TYPE=${DB_TYPE}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - TZ=${TZ}
     networks:
       - fillytrckr_network
     depends_on:
@@ -27,9 +34,9 @@ services:
     image: postgres:15
     container_name: fillytrckr-postgres
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=fillytrckr
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
