@@ -13,7 +13,7 @@ for /f "tokens=1,2 delims==" %%a in (config.env) do (
 set FULL_IMAGE=%DOCKER_REGISTRY%/%BACKEND_IMAGE%:%IMAGE_TAG%
 
 echo Building image: %FULL_IMAGE%
-docker build -t %FULL_IMAGE% ./backend
+docker build -t %FULL_IMAGE% -f ./backend/Dockerfile .
 
 if %ERRORLEVEL% EQU 0 (
     echo Backend build successful!

@@ -4,29 +4,21 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies if needed
+# Install system dependencies for PostgreSQL
 RUN apt-get update && apt-get install -y \
     gcc \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create common directory structure
-RUN mkdir -p /app/common
+# Copy common module files
+COPY common/*.py ./common/
 
-# Copy common module files (excluding test, __pycache__, and config.json)
-COPY ../common/*.py /app/common/
-COPY ../common/*.env /app/common/
-COPY ../common/*.md /app/common/
-COPY ../common/config_example.json /app/common/
-
-# Copy backend files (excluding test and __pycache__)
-COPY *.py /app/
-COPY *.env /app/
-COPY *.json /app/
-COPY *.md /app/
+# Copy backend files
+COPY backend/*.py ./
 
 # Create logs directory
 RUN mkdir -p /app/logs

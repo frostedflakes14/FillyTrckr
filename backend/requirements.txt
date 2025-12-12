@@ -2,3 +2,4 @@ sqlalchemy
 uvicorn
 fastapi
 pydantic
+psycopg2-binary
