@@ -6,7 +6,6 @@ import BrandsPage from './pages/BrandsPage'
 import TypesPage from './pages/TypesPage'
 import SubtypesPage from './pages/SubtypesPage'
 import ColorsPage from './pages/ColorsPage'
-import RollsPage from './pages/RollsPage'
 
 /**
  * Main App Component
@@ -28,7 +27,6 @@ function App() {
         <Route path="types" element={<TypesPage />} />
         <Route path="subtypes" element={<SubtypesPage />} />
         <Route path="colors" element={<ColorsPage />} />
-        <Route path="rolls" element={<RollsPage />} />
         {/* Add more routes here as you build features */}
       </Route>
     </Routes>

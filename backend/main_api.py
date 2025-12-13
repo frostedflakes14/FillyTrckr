@@ -47,7 +47,8 @@ class FillyAPI:
         self.app = FastAPI(
             title="FillyTrckr API",
             version="1.0.0",
-            openapi_tags=tags_metadata
+            openapi_tags=tags_metadata,
+            docs_url = "/api-docs"
         )
         self.db = None
 

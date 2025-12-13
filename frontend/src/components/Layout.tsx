@@ -46,11 +46,13 @@ function Layout() {
           <Button color="inherit" component={Link} to="/colors">
             Colors
           </Button>
-          <Button color="inherit" component={Link} to="/rolls">
-            Rolls
-          </Button>
           <Button color="inherit" component={Link} to="/about">
             About
+          </Button>
+
+          {/* API Docs - uses regular anchor tag since it goes to backend */}
+          <Button color="inherit" component="a" href="/api-docs" target="_blank">
+            API Docs
           </Button>
 
           {/* API status indicator */}
