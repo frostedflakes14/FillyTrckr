@@ -90,7 +90,6 @@ function HomePage() {
   const [filterColorId, setFilterColorId] = useState<number | ''>('')
   const [filterTypeId, setFilterTypeId] = useState<number | ''>('')
   const [filterSubtypeId, setFilterSubtypeId] = useState<number | ''>('')
-  const [filterOpenedOnly, setFilterOpenedOnly] = useState(false)
   const [filterInUseOnly, setFilterInUseOnly] = useState(false)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
 
@@ -164,7 +163,6 @@ function HomePage() {
       if (filterColorId !== '') params.color_id = filterColorId
       if (filterTypeId !== '') params.type_id = filterTypeId
       if (filterSubtypeId !== '') params.subtype_id = filterSubtypeId
-      if (filterOpenedOnly) params.opened = true
       if (filterInUseOnly) params.in_use = true
 
       const response = await api.get('/v1/filly/rolls/filter', { params })
@@ -204,8 +202,6 @@ function HomePage() {
       if (filterTypeId !== '' && roll.type_id !== filterTypeId) return false
       // Subtype filter
       if (filterSubtypeId !== '' && roll.subtype_id !== filterSubtypeId) return false
-      // Opened only filter
-      if (filterOpenedOnly && !roll.opened) return false
       // In use only filter
       if (filterInUseOnly && !roll.in_use) return false
 
@@ -265,7 +261,7 @@ function HomePage() {
   useEffect(() => {
     fetchRolls()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterBrandId, filterColorId, filterTypeId, filterSubtypeId, filterOpenedOnly, filterInUseOnly])
+  }, [filterBrandId, filterColorId, filterTypeId, filterSubtypeId, filterInUseOnly])
 
   const handleToggleInUse = async (id: number, currentInUse: boolean) => {
     try {
@@ -350,7 +346,6 @@ function HomePage() {
     setFilterColorId('')
     setFilterTypeId('')
     setFilterSubtypeId('')
-    setFilterOpenedOnly(false)
     setFilterInUseOnly(false)
   }
 
@@ -435,7 +430,7 @@ function HomePage() {
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
             Filters
-            {!filtersExpanded && (filterBrandId || filterColorId || filterTypeId || filterSubtypeId || filterOpenedOnly || filterInUseOnly) && (
+            {!filtersExpanded && (filterBrandId || filterColorId || filterTypeId || filterSubtypeId || filterInUseOnly) && (
               <Typography component="span" variant="caption" sx={{ ml: 1, color: 'primary.main' }}>
                 (Active)
               </Typography>
@@ -531,18 +526,6 @@ function HomePage() {
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, gap: { xs: 1, sm: 2 } }}>
-              {/* Opened Only Toggle */}
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={filterOpenedOnly}
-                    onChange={(e) => setFilterOpenedOnly(e.target.checked)}
-                  />
-                }
-                label="Opened Only"
-              />
-
               {/* In Use Only Toggle */}
               <FormControlLabel
                 control={
