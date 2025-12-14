@@ -110,7 +110,21 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ open, onClose, onSuccess,
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   <Box sx={{ width: 56, height: 56, borderRadius: 1, backgroundColor: color, border: '1px solid rgba(0,0,0,0.12)' }} />
-                  <Typography variant="body2">{color.toUpperCase()}</Typography>
+                  <TextField
+                    label="Hex Code"
+                    value={color.toUpperCase()}
+                    onChange={(e) => {
+                      const value = e.target.value.trim()
+                      // Allow typing # prefix or not
+                      if (value.match(/^#?[0-9A-Fa-f]{0,6}$/)) {
+                        const normalized = value.startsWith('#') ? value : `#${value}`
+                        setColor(normalized)
+                      }
+                    }}
+                    placeholder="#AABBCC"
+                    size="small"
+                    sx={{ width: 120 }}
+                  />
                 </Box>
               </Box>
             </Box>

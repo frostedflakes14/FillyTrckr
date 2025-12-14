@@ -84,8 +84,11 @@ class db_connect:
         # Create session factory
         self.SessionLocal = sessionmaker(bind=self.engine)
 
-        # Always populate default data (only adds missing entries)
-        self._populate_default_data()
+        # Only populate if sqlite (local testing)
+        if self._config.database_info.type == 'sqlite':
+            self._populate_default_data()
+        else:
+            self._init_db_no_data()
 
     @contextmanager
     def get_session(self):
@@ -107,6 +110,10 @@ class db_connect:
             raise
         finally:
             session.close()
+
+    def _init_db_no_data(self):
+        """Inits the database but doesn't add data (like _populate_default_data)."""
+        Base.metadata.create_all(self.engine)
 
     def _populate_default_data(self):
         """Populate default data into the database tables.
