@@ -114,7 +114,7 @@ function ColorsPage() {
     <Box>
       {/* Title */}
       <Box sx={{ mb: 1 }}>
-        <Typography variant="h3" component="h1">
+        <Typography variant="h3" component="h1" sx={{ fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' } }}>
           Filament Colors
         </Typography>
       </Box>
@@ -129,7 +129,7 @@ function ColorsPage() {
         </Alert>
       )}
 
-      <Box sx={{ height: 'calc(100vh - 300px)', minHeight: 400, width: '100%', position: 'relative' }}>
+      <Box sx={{ height: { xs: 'calc(100vh - 250px)', md: 'calc(100vh - 300px)' }, minHeight: 400, width: '100%', position: 'relative' }}>
         <DataGrid
           rows={colors}
           columns={columns}

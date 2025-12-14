@@ -9,7 +9,7 @@ import { Typography, Paper, Box } from '@mui/material'
 function AboutPage() {
   return (
     <Box>
-      <Typography variant="h3" component="h1" gutterBottom>
+      <Typography variant="h3" component="h1" gutterBottom sx={{ fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' } }}>
         About FillyTrckr
       </Typography>
 

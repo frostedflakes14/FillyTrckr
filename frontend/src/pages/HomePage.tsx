@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Typography, Box, Alert, Snackbar, AlertColor, Tooltip, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem, FormControl, InputLabel, FormControlLabel, Switch } from '@mui/material'
+import { Typography, Box, Alert, Snackbar, AlertColor, Tooltip, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem, FormControl, InputLabel, FormControlLabel, Switch, Collapse, IconButton } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser'
+import InventoryIcon from '@mui/icons-material/Inventory'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import ToggleOffIcon from '@mui/icons-material/ToggleOff'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { api } from '../utils/api'
 import AddRollDialog from '../components/AddRollDialog'
 
@@ -89,6 +92,7 @@ function HomePage() {
   const [filterSubtypeId, setFilterSubtypeId] = useState<number | ''>('')
   const [filterOpenedOnly, setFilterOpenedOnly] = useState(false)
   const [filterInUseOnly, setFilterInUseOnly] = useState(false)
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
 
   // Dialog state
   const [addOpen, setAddOpen] = useState(false)
@@ -393,14 +397,15 @@ function HomePage() {
   return (
     <Box>
       {/* Title with Add Button */}
-      <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h3" component="h1">
+      <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+        <Typography variant="h3" component="h1" sx={{ fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' } }}>
           Filament Rolls
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setAddOpen(true)}
+          sx={{ minWidth: { xs: '100%', sm: 'auto' } }}
         >
           Add Roll
         </Button>
@@ -413,127 +418,158 @@ function HomePage() {
       )}
 
       {/* Filter Section */}
-      <Box sx={{ mb: 2, p: 1.5, backgroundColor: 'background.paper', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
-        <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold' }}>Filters</Typography>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1.5, mb: 1.5 }}>
-          {/* Brand Filter */}
-          <FormControl fullWidth size="small">
-            <InputLabel>Brand</InputLabel>
-            <Select
-              value={filterBrandId}
-              label="Brand"
-              onChange={(e) => setFilterBrandId(e.target.value as number | '')}
-            >
-              <MenuItem value="">All</MenuItem>
-              {brands.map((brand) => (
-                <MenuItem key={brand.id} value={brand.id}>
-                  {brand.name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Type Filter */}
-          <FormControl fullWidth size="small">
-            <InputLabel>Type</InputLabel>
-            <Select
-              value={filterTypeId}
-              label="Type"
-              onChange={(e) => setFilterTypeId(e.target.value as number | '')}
-            >
-              <MenuItem value="">All</MenuItem>
-              {types.map((type) => (
-                <MenuItem key={type.id} value={type.id}>
-                  {type.name.toUpperCase()}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Subtype Filter */}
-          <FormControl fullWidth size="small">
-            <InputLabel>Subtype</InputLabel>
-            <Select
-              value={filterSubtypeId}
-              label="Subtype"
-              onChange={(e) => setFilterSubtypeId(e.target.value as number | '')}
-            >
-              <MenuItem value="">All</MenuItem>
-              {subtypes.map((subtype) => (
-                <MenuItem key={subtype.id} value={subtype.id}>
-                  {subtype.name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Color Filter */}
-          <FormControl fullWidth size="small">
-            <InputLabel>Color</InputLabel>
-            <Select
-              value={filterColorId}
-              label="Color"
-              onChange={(e) => setFilterColorId(e.target.value as number | '')}
-            >
-              <MenuItem value="">All</MenuItem>
-              {colors.map((color) => (
-                <MenuItem key={color.id} value={color.id}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Box
-                      sx={{
-                        width: 16,
-                        height: 16,
-                        borderRadius: '50%',
-                        backgroundColor: color.hex_code,
-                        border: '1px solid #ccc',
-                      }}
-                    />
-                    {color.name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+      <Box sx={{ mb: 2, backgroundColor: 'background.paper', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
+        {/* Filter Header - Always Visible */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            p: 1.5,
+            cursor: 'pointer',
+            '&:hover': {
+              backgroundColor: 'action.hover',
+            },
+          }}
+          onClick={() => setFiltersExpanded(!filtersExpanded)}
+        >
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            Filters
+            {!filtersExpanded && (filterBrandId || filterColorId || filterTypeId || filterSubtypeId || filterOpenedOnly || filterInUseOnly) && (
+              <Typography component="span" variant="caption" sx={{ ml: 1, color: 'primary.main' }}>
+                (Active)
+              </Typography>
+            )}
+          </Typography>
+          <IconButton size="small">
+            {filtersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {/* Opened Only Toggle */}
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={filterOpenedOnly}
-                onChange={(e) => setFilterOpenedOnly(e.target.checked)}
-              />
-            }
-            label="Opened Only"
-          />
+        {/* Collapsible Filter Content */}
+        <Collapse in={filtersExpanded}>
+          <Box sx={{ px: 1.5, pb: 1.5 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 1.5, mb: 1.5 }}>
+              {/* Brand Filter */}
+              <FormControl fullWidth size="small">
+                <InputLabel>Brand</InputLabel>
+                <Select
+                  value={filterBrandId}
+                  label="Brand"
+                  onChange={(e) => setFilterBrandId(e.target.value as number | '')}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {brands.map((brand) => (
+                    <MenuItem key={brand.id} value={brand.id}>
+                      {brand.name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-          {/* In Use Only Toggle */}
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={filterInUseOnly}
-                onChange={(e) => setFilterInUseOnly(e.target.checked)}
-              />
-            }
-            label="In Use Only"
-          />
+              {/* Type Filter */}
+              <FormControl fullWidth size="small">
+                <InputLabel>Type</InputLabel>
+                <Select
+                  value={filterTypeId}
+                  label="Type"
+                  onChange={(e) => setFilterTypeId(e.target.value as number | '')}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {types.map((type) => (
+                    <MenuItem key={type.id} value={type.id}>
+                      {type.name.toUpperCase()}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-          {/* Clear Filters Button */}
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={handleClearFilters}
-            sx={{ ml: 'auto' }}
-          >
-            Clear Filters
-          </Button>
-        </Box>
+              {/* Subtype Filter */}
+              <FormControl fullWidth size="small">
+                <InputLabel>Subtype</InputLabel>
+                <Select
+                  value={filterSubtypeId}
+                  label="Subtype"
+                  onChange={(e) => setFilterSubtypeId(e.target.value as number | '')}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {subtypes.map((subtype) => (
+                    <MenuItem key={subtype.id} value={subtype.id}>
+                      {subtype.name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Color Filter */}
+              <FormControl fullWidth size="small">
+                <InputLabel>Color</InputLabel>
+                <Select
+                  value={filterColorId}
+                  label="Color"
+                  onChange={(e) => setFilterColorId(e.target.value as number | '')}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {colors.map((color) => (
+                    <MenuItem key={color.id} value={color.id}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                          sx={{
+                            width: 16,
+                            height: 16,
+                            borderRadius: '50%',
+                            backgroundColor: color.hex_code,
+                            border: '1px solid #ccc',
+                          }}
+                        />
+                        {color.name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, gap: { xs: 1, sm: 2 } }}>
+              {/* Opened Only Toggle */}
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={filterOpenedOnly}
+                    onChange={(e) => setFilterOpenedOnly(e.target.checked)}
+                  />
+                }
+                label="Opened Only"
+              />
+
+              {/* In Use Only Toggle */}
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={filterInUseOnly}
+                    onChange={(e) => setFilterInUseOnly(e.target.checked)}
+                  />
+                }
+                label="In Use Only"
+              />
+
+              {/* Clear Filters Button */}
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={handleClearFilters}
+                sx={{ ml: { xs: 0, sm: 'auto' } }}
+              >
+                Clear Filters
+              </Button>
+            </Box>
+          </Box>
+        </Collapse>
       </Box>
 
-      <Box sx={{ height: 'calc(100vh - 300px)', minHeight: 400, width: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ height: { xs: 'calc(100vh - 250px)', md: 'calc(100vh - 300px)' }, minHeight: 400, width: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ flex: 1, overflow: 'auto' }}>
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -546,76 +582,182 @@ function HomePage() {
                 <Box
                   sx={{
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
+                    flexDirection: { xs: 'column', md: 'row' },
+                    alignItems: { xs: 'stretch', md: 'center' },
+                    gap: { xs: 0.5, md: 2 },
                     p: 1.5,
                     backgroundColor: 'background.paper',
                   }}
                 >
-                  {/* Brand - TYPE - Subtype */}
-                  <Typography variant="body2" sx={{ minWidth: 250 }}>
-                    {group.brand_name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
-                    {' - '}
-                    {group.type_name.toUpperCase()}
-                    {' - '}
-                    {group.subtype_name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
-                  </Typography>
+                  {/* Desktop: Color first, then brand/type/subtype, then weight */}
+                  {/* Mobile Line 1: Brand/Type/Subtype on left, Color on right */}
+                  <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'space-between', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                    {/* Brand - TYPE - Subtype */}
+                    <Typography variant="body2" sx={{ flex: 1, minWidth: '200px' }}>
+                      {group.brand_name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                      {' - '}
+                      {group.type_name.toUpperCase()}
+                      {' - '}
+                      {group.subtype_name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                    </Typography>
 
-                  {/* Color */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 120 }}>
-                    <Box
-                      sx={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: '50%',
-                        backgroundColor: group.color_hex,
-                        border: '2px solid #ccc',
-                        flexShrink: 0,
-                      }}
-                    />
+                    {/* Color - right justified on mobile */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          backgroundColor: group.color_hex,
+                          border: '2px solid #ccc',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <Typography variant="body2">
+                        {group.color_name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Desktop only: horizontal layout */}
+                  <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2, flex: 1 }}>
+                    {/* Color first on desktop */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          backgroundColor: group.color_hex,
+                          border: '2px solid #ccc',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <Typography variant="body2">
+                        {group.color_name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                      </Typography>
+                    </Box>
+
+                    {/* Brand - TYPE - Subtype */}
                     <Typography variant="body2">
-                      {group.color_name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                      {group.brand_name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                      {' - '}
+                      {group.type_name.toUpperCase()}
+                      {' - '}
+                      {group.subtype_name.split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+                    </Typography>
+
+                    {/* Original Weight */}
+                    <Typography variant="body2" sx={{ minWidth: 60 }}>
+                      {group.original_weight_grams}g
                     </Typography>
                   </Box>
 
-                  {/* Original Weight */}
-                  <Typography variant="body2" sx={{ minWidth: 60 }}>
-                    {group.original_weight_grams}g
-                  </Typography>
+                  {/* Mobile Line 2: Weight and buttons on same line */}
+                  <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1, justifyContent: 'space-between' }}>
+                    <Typography variant="body2">
+                      {group.original_weight_grams}g
+                    </Typography>
 
-                  {/* Unopened Rolls Info */}
-                  {group.unopenedRolls.length > 0 && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {group.unopenedRolls.length} unopened
-                      </Typography>
+                    {/* Action buttons - on mobile line 2, on desktop separate section */}
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'nowrap', alignItems: 'center' }}>
+                      {/* Unopened Rolls Info */}
+                      {group.unopenedRolls.length > 0 && (
+                        <>
+                          {/* Mobile: Show count with inventory icon */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
+                            <Typography variant="body2" component="span">
+                              {group.unopenedRolls.length}x
+                            </Typography>
+                            <InventoryIcon sx={{ fontSize: '1.2rem' }} />
+                          </Box>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleOpenNewRoll(group)
+                            }}
+                            startIcon={<OpenInBrowserIcon />}
+                            sx={{
+                              whiteSpace: 'nowrap',
+                              minWidth: 'auto',
+                              px: 1,
+                              '& .MuiButton-startIcon': { m: 0 }
+                            }}
+                          />
+                        </>
+                      )}
+
+                      {/* Duplicate Button */}
                       <Button
                         size="small"
-                        variant="contained"
+                        variant="outlined"
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleOpenNewRoll(group)
+                          handleDuplicateGroup(group)
                         }}
-                        startIcon={<CheckCircleIcon />}
-                      >
-                        Open New
-                      </Button>
+                        startIcon={<ContentCopyIcon />}
+                        sx={{
+                          whiteSpace: 'nowrap',
+                          minWidth: 'auto',
+                          px: 1,
+                          '& .MuiButton-startIcon': { m: 0 }
+                        }}
+                      />
                     </Box>
-                  )}
+                  </Box>
 
-                  {/* Duplicate Button */}
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleDuplicateGroup(group)
-                    }}
-                    startIcon={<ContentCopyIcon />}
-                    sx={{ ml: group.unopenedRolls.length === 0 ? 'auto' : 0 }}
-                  >
-                    Duplicate
-                  </Button>
+                  {/* Desktop only: Action buttons section */}
+                  <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+                    {/* Unopened Rolls Info */}
+                    {group.unopenedRolls.length > 0 && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {/* Desktop: Show inventory icon on left of text */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {group.unopenedRolls.length}
+                          </Typography>
+                          <InventoryIcon sx={{ fontSize: '1.2rem', color: 'text.secondary' }} />
+                          <Typography variant="body2" color="text.secondary">
+                            unopened
+                          </Typography>
+                        </Box>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleOpenNewRoll(group)
+                          }}
+                          startIcon={<OpenInBrowserIcon />}
+                          sx={{
+                            whiteSpace: 'nowrap',
+                            px: 2,
+                          }}
+                        >
+                          Open{group.unopenedRolls.length > 0 ? ` (${group.unopenedRolls.length})` : ''}
+                        </Button>
+                      </Box>
+                    )}
+
+                    {/* Duplicate Button */}
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDuplicateGroup(group)
+                      }}
+                      startIcon={<ContentCopyIcon />}
+                      sx={{
+                        whiteSpace: 'nowrap',
+                        px: 2,
+                      }}
+                    >
+                      Duplicate
+                    </Button>
+                  </Box>
                 </Box>
 
                 {/* Opened Rolls Sub-section */}
@@ -626,16 +768,19 @@ function HomePage() {
                         key={roll.id}
                         sx={{
                           display: 'flex',
+                          flexDirection: 'row',
                           alignItems: 'center',
-                          gap: 1.5,
+                          justifyContent: 'space-between',
+                          gap: { xs: 1, md: 1.5 },
                           p: 1,
-                          pl: 4,
+                          pl: { xs: 2, md: 4 },
                           backgroundColor: 'background.paper',
                           borderTop: '1px solid',
                           borderColor: 'divider',
                         }}
                       >
-                        <Box sx={{ flex: 1 }}>
+                        {/* Left column on mobile, left section on desktop: Roll# and In Use */}
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 0.5, md: 1 }, alignItems: { xs: 'flex-start', md: 'center' } }}>
                           <Tooltip
                             title={
                               <Box>
@@ -647,101 +792,117 @@ function HomePage() {
                                 </Typography>
                               </Box>
                             }
-                            placement="left"
+                            placement="top"
                           >
                             <Typography variant="body2" sx={{ fontWeight: 'bold', cursor: 'help', display: 'inline' }}>
                               Roll #{roll.id}
                             </Typography>
                           </Tooltip>
-                        </Box>
-                        <Box
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleWeightClick(roll)
-                          }}
-                          sx={{
-                            cursor: 'pointer',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            backgroundColor: 'action.hover',
-                            transition: 'background-color 0.2s',
-                            '&:hover': {
-                              backgroundColor: 'action.selected',
-                            },
-                          }}
-                        >
-                          <Typography variant="body2">
-                            {roll.weight_grams}g
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+
+                          {/* In Use Button */}
                           <Button
                             size="small"
-                            variant="text"
-                            onClick={async (e) => {
+                            variant="outlined"
+                            color={roll.in_use ? 'primary' : 'inherit'}
+                            onClick={(e) => {
                               e.stopPropagation()
-                              try {
-                                await api.post(`/v1/filly/rolls/${roll.id}/update_weight`, {
-                                  decrease_by_grams: 50
-                                })
-                                fetchRolls()
-                              } catch (err) {
-                                console.error('Weight update error:', err)
-                              }
+                              handleToggleInUse(roll.id, roll.in_use)
                             }}
-                            sx={{ minWidth: 'auto', px: 0.5, fontSize: '0.7rem' }}
-                          >
-                            -50g
-                          </Button>
-                          <Button
-                            size="small"
-                            variant="text"
-                            onClick={async (e) => {
-                              e.stopPropagation()
-                              try {
-                                await api.post(`/v1/filly/rolls/${roll.id}/update_weight`, {
-                                  decrease_by_grams: 100
-                                })
-                                fetchRolls()
-                              } catch (err) {
-                                console.error('Weight update error:', err)
-                              }
+                            startIcon={roll.in_use ? <ToggleOnIcon /> : <ToggleOffIcon />}
+                            sx={{
+                              whiteSpace: 'nowrap',
+                              minWidth: { xs: 'auto', md: 'auto' },
+                              px: { xs: 1, md: 2 },
+                              '& .MuiButton-startIcon': { m: { xs: 0, md: '0 8px 0 -4px' } }
                             }}
-                            sx={{ minWidth: 'auto', px: 0.5, fontSize: '0.7rem' }}
                           >
-                            -100g
-                          </Button>
-                          <Button
-                            size="small"
-                            variant="text"
-                            onClick={async (e) => {
-                              e.stopPropagation()
-                              try {
-                                await api.post(`/v1/filly/rolls/${roll.id}/update_weight`, {
-                                  new_weight_grams: 0
-                                })
-                                fetchRolls()
-                              } catch (err) {
-                                console.error('Weight update error:', err)
-                              }
-                            }}
-                            sx={{ minWidth: 'auto', px: 0.5, fontSize: '0.7rem' }}
-                          >
-                            empty
+                            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                              In Use
+                            </Box>
                           </Button>
                         </Box>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          color={roll.in_use ? 'primary' : 'inherit'}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleToggleInUse(roll.id, roll.in_use)
-                          }}
-                          startIcon={roll.in_use ? <ToggleOnIcon /> : <ToggleOffIcon />}
-                        >
-                          In Use
-                        </Button>
+
+                        {/* Right column on mobile, right section on desktop: Weight and weight buttons */}
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 0.5, md: 1 }, alignItems: { xs: 'flex-end', md: 'center' } }}>
+                          <Box
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleWeightClick(roll)
+                            }}
+                            sx={{
+                              cursor: 'pointer',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              backgroundColor: 'action.hover',
+                              transition: 'background-color 0.2s',
+                              '&:hover': {
+                                backgroundColor: 'action.selected',
+                              },
+                            }}
+                          >
+                            <Typography variant="body2">
+                              {roll.weight_grams}g
+                            </Typography>
+                          </Box>
+
+                          {/* Weight adjustment buttons */}
+                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'nowrap' }}>
+                            <Button
+                              size="small"
+                              variant="text"
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                try {
+                                  await api.post(`/v1/filly/rolls/${roll.id}/update_weight`, {
+                                    decrease_by_grams: 50
+                                  })
+                                  fetchRolls()
+                                } catch (err) {
+                                  console.error('Weight update error:', err)
+                                }
+                              }}
+                              sx={{ minWidth: 'auto', px: 0.5, fontSize: '0.7rem' }}
+                            >
+                              -50g
+                            </Button>
+                            <Button
+                              size="small"
+                              variant="text"
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                try {
+                                  await api.post(`/v1/filly/rolls/${roll.id}/update_weight`, {
+                                    decrease_by_grams: 100
+                                  })
+                                  fetchRolls()
+                                } catch (err) {
+                                  console.error('Weight update error:', err)
+                                }
+                              }}
+                              sx={{ minWidth: 'auto', px: 0.5, fontSize: '0.7rem' }}
+                            >
+                              -100g
+                            </Button>
+                            <Button
+                              size="small"
+                              variant="text"
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                try {
+                                  await api.post(`/v1/filly/rolls/${roll.id}/update_weight`, {
+                                    new_weight_grams: 0
+                                  })
+                                  fetchRolls()
+                                } catch (err) {
+                                  console.error('Weight update error:', err)
+                                }
+                              }}
+                              sx={{ minWidth: 'auto', px: 0.5, fontSize: '0.7rem' }}
+                            >
+                              empty
+                            </Button>
+                          </Box>
+                        </Box>
                       </Box>
                     ))}
                   </Box>
