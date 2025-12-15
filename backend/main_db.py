@@ -84,11 +84,8 @@ class db_connect:
         # Create session factory
         self.SessionLocal = sessionmaker(bind=self.engine)
 
-        # Only populate if sqlite (local testing)
-        if self._config.database_info.type == 'sqlite':
-            self._populate_default_data()
-        else:
-            self._init_db_no_data()
+        # Initialize database schema and populate default data
+        self._populate_default_data()
 
     @contextmanager
     def get_session(self):

@@ -58,7 +58,7 @@ function Layout() {
           </ListItem>
         ))}
         <ListItem disablePadding>
-          <ListItemButton component="a" href="/api-docs" target="_blank">
+          <ListItemButton component="a" href="/api-docs">
             <ListItemText primary="API Docs" />
           </ListItemButton>
         </ListItem>
@@ -106,7 +106,7 @@ function Layout() {
               ))}
 
               {/* API Docs - uses regular anchor tag since it goes to backend */}
-              <Button color="inherit" component="a" href="/api-docs" target="_blank">
+              <Button color="inherit" component="a" href="/api-docs">
                 API Docs
               </Button>
             </>
