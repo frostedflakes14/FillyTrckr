@@ -19,6 +19,7 @@ function ApiDocsPage() {
         height: 'auto',
         margin: 0,
         padding: 0,
+        backgroundColor: '#ffffff', // Force light background
       }}
     >
       <iframe
@@ -30,6 +31,7 @@ function ApiDocsPage() {
           margin: 0,
           padding: 0,
           display: 'block',
+          colorScheme: 'light', // Hint to browser to use light mode
         }}
         title="API Documentation"
       />
