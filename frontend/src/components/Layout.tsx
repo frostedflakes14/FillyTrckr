@@ -33,6 +33,7 @@ function Layout() {
     { label: 'Subtypes', path: '/subtypes' },
     { label: 'Colors', path: '/colors' },
     { label: 'About', path: '/about' },
+    { label: 'API Docs', path: '/api-documentation' },
   ]
 
   const handleDrawerToggle = () => {
@@ -57,11 +58,6 @@ function Layout() {
             </ListItemButton>
           </ListItem>
         ))}
-        <ListItem disablePadding>
-          <ListItemButton component="a" href="/api-docs">
-            <ListItemText primary="API Docs" />
-          </ListItemButton>
-        </ListItem>
       </List>
       <Divider />
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -104,11 +100,6 @@ function Layout() {
                   {item.label}
                 </Button>
               ))}
-
-              {/* API Docs - uses regular anchor tag since it goes to backend */}
-              <Button color="inherit" component="a" href="/api-docs">
-                API Docs
-              </Button>
             </>
           )}
 
