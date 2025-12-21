@@ -55,7 +55,7 @@ interface RollWithDetails extends Roll {
 }
 
 interface GroupedRoll {
-  id: string // Composite key: brand_id-color_id-type_id-subtype_id
+  id: string // Composite key: brand_id-color_id-type_id-subtype_id-original_weight_grams
   brand_id: number
   color_id: number
   type_id: number
@@ -178,7 +178,7 @@ function HomePage() {
         subtype_name: lookupData.subtypesMap.get(roll.subtype_id)?.name || 'Unknown',
       }))
 
-      // Group rolls by brand, color, type, subtype
+      // Group rolls by brand, color, type, subtype, original weight
       const grouped = groupRollsByType(enrichedRolls)
       setGroupedRolls(grouped)
 
@@ -212,7 +212,7 @@ function HomePage() {
 
     // Group rolls by composite key
     filteredRolls.forEach(roll => {
-      const key = `${roll.brand_id}-${roll.color_id}-${roll.type_id}-${roll.subtype_id}`
+      const key = `${roll.brand_id}-${roll.color_id}-${roll.type_id}-${roll.subtype_id}-${roll.original_weight_grams}`
       if (!groups.has(key)) {
         groups.set(key, [])
       }
