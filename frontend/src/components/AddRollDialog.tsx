@@ -107,12 +107,14 @@ const AddRollDialog: React.FC<AddRollDialogProps> = ({ open, onClose, onSuccess 
       ])
 
       const brandsList = brandsRes.data.brands
+      const colorsList = colorsRes.data.colors
       const typesList = typesRes.data.types
+      const subtypesList = subtypesRes.data.subtypes
 
       setBrands(brandsList)
-      setColors(colorsRes.data.colors)
+      setColors(colorsList)
       setTypes(typesList)
-      setSubtypes(subtypesRes.data.subtypes)
+      setSubtypes(subtypesList)
 
       // Set defaults: Bambu for brand, PLA for type
       const bambuBrand = brandsList.find((b: Brand) => b.name.toLowerCase() === 'bambu')

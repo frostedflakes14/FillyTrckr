@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Typography, Box, Alert, Snackbar, AlertColor, Fab } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import AddIcon from '@mui/icons-material/Add'
-import { api } from '../utils/api'
+import { fetchTypes } from '../utils/api'
 import AddItemDialog from '../components/AddItemDialog'
 import { createDateTimeColumn } from '../utils/dateColumn'
 
@@ -26,11 +26,10 @@ function TypesPage() {
   const [snackSeverity, setSnackSeverity] = useState<AlertColor>('success')
   const [snackAutoHideDuration, setSnackAutoHideDuration] = useState<number | null>(4000)
 
-  const fetchTypes = async () => {
+  const getTypes = async () => {
     setLoading(true)
     try {
-      const response = await api.get('/v1/filly/types')
-      setTypes(response.data?.types || [])
+      setTypes(await fetchTypes())
       setError(null)
     } catch (err) {
       setError('Failed to fetch types. Make sure your backend is running.')
@@ -41,7 +40,7 @@ function TypesPage() {
   }
 
   useEffect(() => {
-    fetchTypes()
+    getTypes()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -133,7 +132,7 @@ function TypesPage() {
             setSnackMsg(`Type ${newName || ''} successfully added to the database. New ID: ${newId ?? 'unknown'}`)
             setSnackSeverity('success')
             setSnackOpen(true)
-            fetchTypes()
+            getTypes()
           }
         }}
       />

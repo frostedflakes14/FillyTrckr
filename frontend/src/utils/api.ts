@@ -56,4 +56,28 @@ export const checkHealth = async () => {
   return response.data
 }
 
-// TODO Possible add more API endpoints here?
+// Brands
+export const fetchBrands = async () => {
+  const response = await api.get('/v1/filly/brands')
+  return response.data?.brands || []
+}
+
+// Types
+export const fetchTypes = async () => {
+  const response = await api.get('/v1/filly/types')
+  return response.data?.types || []
+}
+
+// Subtypes
+export const fetchSubtypes = async () => {
+  const response = await api.get('/v1/filly/subtypes')
+  return response.data?.subtypes || []
+}
+
+// Colors
+export const fetchColors = async () => {
+  const response = await api.get('/v1/filly/colors')
+  return response.data?.colors || []
+}
+
+// TODO Add "all_properties" endpoint function

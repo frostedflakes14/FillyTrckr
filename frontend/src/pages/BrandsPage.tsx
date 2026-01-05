@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Typography, Box, Alert, Snackbar, AlertColor, Fab } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import AddIcon from '@mui/icons-material/Add'
-import { api } from '../utils/api'
+import { fetchBrands } from '../utils/api'
 import AddItemDialog from '../components/AddItemDialog'
 import { createDateTimeColumn } from '../utils/dateColumn'
 
@@ -26,11 +26,10 @@ function BrandsPage() {
   const [snackSeverity, setSnackSeverity] = useState<AlertColor>('success')
   const [snackAutoHideDuration, setSnackAutoHideDuration] = useState<number | null>(4000)
 
-  const fetchBrands = async () => {
+  const getBrands = async () => {
     setLoading(true)
     try {
-      const response = await api.get('/v1/filly/brands')
-      setBrands(response.data?.brands || [])
+      setBrands(await fetchBrands())
       setError(null)
     } catch (err) {
       setError('Failed to fetch brands. Make sure your backend is running.')
@@ -41,7 +40,7 @@ function BrandsPage() {
   }
 
   useEffect(() => {
-    fetchBrands()
+    getBrands()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -136,7 +135,7 @@ function BrandsPage() {
             setSnackMsg(`Brand ${newName || ''} successfully added to the database. New ID: ${newId ?? 'unknown'}`)
             setSnackSeverity('success')
             setSnackOpen(true)
-            fetchBrands()
+            getBrands()
           }
         }}
       />

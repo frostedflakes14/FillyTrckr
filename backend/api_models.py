@@ -159,6 +159,47 @@ class response_get_subtypes(BaseModel):
             }
         }
 
+class response_get_all_properties(BaseModel):
+    brands: list[dict]
+    types: list[dict]
+    colors: list[dict]
+    subtypes: list[dict]
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "brands": [
+                    {
+                        "id": 1,
+                        "name": "bambu",
+                        "created_at": "2024-01-01T12:00:00Z"
+                    }
+                ],
+                "types": [
+                    {
+                        "id": 1,
+                        "name": "pla",
+                        "created_at": "2024-01-01T12:00:00Z"
+                    }
+                ],
+                "subtypes": [
+                    {
+                        "id": 1,
+                        "name": "silk",
+                        "created_at": "2024-01-01T12:00:00Z"
+                    }
+                ],
+                "colors": [
+                    {
+                        "id": 1,
+                        "name": "red",
+                        "hex_code": "#FF0000",
+                        "created_at": "2024-01-01T12:00:00Z"
+                    }
+                ]
+            }
+        }
+
 class response_roll_data(BaseModel):
     id: int
     type: str

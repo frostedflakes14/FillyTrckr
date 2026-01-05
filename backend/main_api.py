@@ -150,6 +150,27 @@ class FillyAPI:
             return {"subtypes": subtypes}
 
         @self.app.get(
+                "/api/v1/filly/all_properties",
+                response_model=api_models.response_get_all_properties,
+                summary="Get all filly properties (Brands, Subtypes, Types, and Colors)",
+                description="Returns Brands, Subtypes, Types and Colors - equivalent to api/v1/filly/{brands, types, subtypes, colors} in 1 API call",
+                tags=["Roll Properties"]
+        )
+        async def get_all_properties():
+            if not self.db:
+                raise HTTPException(status_code=500, detail="Database not connected")
+            brands = self.db.get_filly_brands()
+            types = self.db.get_filly_types()
+            subtypes = self.db.get_filly_subtypes()
+            colors = self.db.get_filly_colors()
+            return {
+                "brands": brands,
+                "types": types,
+                "subtypes": subtypes,
+                "colors": colors
+            }
+
+        @self.app.get(
                 "/api/v1/filly/rolls/all",
                 response_model=api_models.response_get_rolls,
                 summary="Get all filly rolls",

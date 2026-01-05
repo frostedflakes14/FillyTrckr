@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Typography, Box, Alert, Snackbar, AlertColor, Fab } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import AddIcon from '@mui/icons-material/Add'
-import { api } from '../utils/api'
+import { fetchSubtypes } from '../utils/api'
 import AddItemDialog from '../components/AddItemDialog'
 import { createDateTimeColumn } from '../utils/dateColumn'
 
@@ -26,11 +26,10 @@ function SubtypesPage() {
   const [snackSeverity, setSnackSeverity] = useState<AlertColor>('success')
   const [snackAutoHideDuration, setSnackAutoHideDuration] = useState<number | null>(4000)
 
-  const fetchSubtypes = async () => {
+  const getSubtypes = async () => {
     setLoading(true)
     try {
-      const response = await api.get('/v1/filly/subtypes')
-      setSubtypes(response.data?.subtypes || [])
+      setSubtypes(await fetchSubtypes())
       setError(null)
     } catch (err) {
       setError('Failed to fetch subtypes. Make sure your backend is running.')
@@ -41,7 +40,7 @@ function SubtypesPage() {
   }
 
   useEffect(() => {
-    fetchSubtypes()
+    getSubtypes()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -136,7 +135,7 @@ function SubtypesPage() {
             setSnackMsg(`Subtype ${newName || ''} successfully added to the database. New ID: ${newId ?? 'unknown'}`)
             setSnackSeverity('success')
             setSnackOpen(true)
-            fetchSubtypes()
+            getSubtypes()
           }
         }}
       />

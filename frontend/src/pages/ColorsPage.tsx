@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Typography, Box, Alert, Snackbar, AlertColor, Tooltip, Fab } from '@mui/material'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import AddIcon from '@mui/icons-material/Add'
-import { api } from '../utils/api'
+import { fetchColors } from '../utils/api'
 import AddItemDialog from '../components/AddItemDialog'
 import { createDateTimeColumn } from '../utils/dateColumn'
 
@@ -27,13 +27,10 @@ function ColorsPage() {
   const [snackSeverity, setSnackSeverity] = useState<AlertColor>('success')
   const [snackAutoHideDuration, setSnackAutoHideDuration] = useState<number | null>(4000)
 
-  const fetchColors = async () => {
+  const getColors = async () => {
     setLoading(true)
     try {
-      // `api` has baseURL '/api' so endpoints passed to it should be relative to that base.
-      // Use '/v1/filly/colors' instead of '/api/v1/filly/colors' to avoid doubling /api in the request URL.
-      const response = await api.get('/v1/filly/colors')
-      setColors(response.data?.colors || [])
+      setColors(await fetchColors())
       setError(null)
     } catch (err) {
       setError('Failed to fetch colors. Make sure your backend is running.')
@@ -44,7 +41,7 @@ function ColorsPage() {
   }
 
   useEffect(() => {
-    fetchColors()
+    getColors()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -188,7 +185,7 @@ function ColorsPage() {
             setSnackSeverity('success')
             setSnackOpen(true)
             // Refresh table to include the new color
-            fetchColors()
+            getColors()
           }
         }}
       />
